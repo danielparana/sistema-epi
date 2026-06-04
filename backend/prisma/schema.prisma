@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+}
+
+model Employee {
+
+  id        Int      @id @default(autoincrement())
+  nome      String
+  cpf       String   @unique
+  cargo     String
+  createdAt DateTime @default(now())
+
+  deliveries Delivery[]
+  
+
+}
+
+model Epi {
+
+  id         Int      @id @default(autoincrement())
+  nome       String
+  lote       String
+  quantidade Int
+  validade   DateTime
+  createdAt  DateTime @default(now())
+
+  deliveries Delivery[]
+  
+
+}
+
+model Delivery {
+
+  id          Int      @id @default(autoincrement())
+  employeeId  Int
+  epiId       Int
+  quantidade  Int
+  dataEntrega DateTime @default(now())
+
+  employee    Employee @relation(fields: [employeeId], references: [id])
+  epi         Epi      @relation(fields: [epiId], references: [id])
+
+}

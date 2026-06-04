@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Entregas - EPI Fácil</title>
+</head>
+<body class="bg-slate-50 min-h-screen text-gray-800">
+
+    <!-- ==========================================
+         CABEÇALHO GLOBAL (Entregas Ativo)
+         ========================================== -->
+    <header class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            
+            <div class="flex items-center space-x-6">
+                <span class="text-[#0056D2] font-bold text-xl tracking-tight">EPI Fácil</span>
+                <div class="hidden md:block h-6 border-l border-gray-300"></div>
+                <h1 class="hidden md:block text-gray-700 font-semibold text-lg">Sistema de Controle de EPIs</h1>
+            </div>
+
+            <div class="flex items-center space-x-4 text-gray-500">
+                <button class="hover:text-[#0056D2] transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </button>
+                <button class="hover:text-[#0056D2] transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
+                <button class="w-9 h-9 rounded-full bg-yellow-400 overflow-hidden border-2 border-white shadow-sm flex items-center justify-center">
+                    <img src="https://raw.githubusercontent.com/tailwindlabs/tailwindcss/master/.github/logo-light.svg" alt="Avatar" class="w-full h-full object-cover">
+                </button>
+            </div>
+        </div>
+
+        <!-- Menu de Abas -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex justify-center space-x-6 md:space-x-12 overflow-x-auto">
+                <a href="dashboard.html" class="py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 text-sm font-medium whitespace-nowrap transition-colors">Dashboard</a>
+                <a href="funcionarios.html" class="py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 text-sm font-medium whitespace-nowrap transition-colors">Funcionários</a>
+                <a href="#" class="py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 text-sm font-medium whitespace-nowrap transition-colors">EPIs</a>
+                
+                <!-- Aba Ativa -->
+                <a href="entregas.html" class="py-3 px-1 border-b-2 border-[#0056D2] text-[#0056D2] text-sm font-semibold whitespace-nowrap">Entregas</a>
+                
+                <a href="relatorios.html" class="py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 text-sm font-medium whitespace-nowrap transition-colors">Relatórios</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ==========================================
+         CONTEÚDO DA PÁGINA (Registro de Entrega)
+         ========================================== -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        
+        <h2 class="text-xl font-semibold text-gray-800 mb-6">Registro de Entrega</h2>
+
+        <!-- Container do Formulário -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 md:p-10">
+            <form action="#" method="POST">
+                
+                <!-- Grid Principal: Divide em duas colunas no desktop -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+                    
+                    <!-- COLUNA 1: DADOS DA ENTREGA (Esquerda) -->
+                    <div class="space-y-6">
+                        
+                        <!-- Select: Funcionário -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mb-2">Funcionário</label>
+                            <select class="w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#0056D2] focus:border-[#0056D2] text-sm text-gray-600 bg-white shadow-sm appearance-none">
+                                <option value="" disabled selected>Selecione o funcionário</option>
+                                <option value="1">João Silva</option>
+                                <option value="2">Maria Oliveira</option>
+                            </select>
+                        </div>
+
+                        <!-- Select: EPI -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mb-2">EPI</label>
+                            <select class="w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#0056D2] focus:border-[#0056D2] text-sm text-gray-600 bg-white shadow-sm appearance-none">
+                                <option value="" disabled selected>Selecione o EPI</option>
+                                <option value="1">Capacete de Segurança Classe B</option>
+                                <option value="2">Luvas de Raspa</option>
+                            </select>
+                        </div>
+
+                        <!-- Select: Lote -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mb-2">Lote</label>
+                            <select class="w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#0056D2] focus:border-[#0056D2] text-sm text-gray-600 bg-white shadow-sm appearance-none">
+                                <option value="" disabled selected>Selecione o lote</option>
+                                <option value="l1">Lote 2026-A</option>
+                                <option value="l2">Lote 2026-B</option>
+                            </select>
+                        </div>
+
+                        <!-- Input Number: Quantidade -->
+                        <div class="flex flex-col w-32">
+                            <label class="text-sm font-medium text-gray-700 mb-2">Quantidade</label>
+                            <input type="number" min="1" value="1" class="w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#0056D2] focus:border-[#0056D2] text-sm text-gray-700 shadow-sm">
+                        </div>
+
+                    </div>
+
+                    <!-- COLUNA 2: COMPROVAÇÃO E ASSINATURA (Direita) -->
+                    <div class="space-y-6">
+                        
+                        <!-- Select: Tipo de Entrega -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mb-2">Tipo de Entrega</label>
+                            <select class="w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#0056D2] focus:border-[#0056D2] text-sm text-gray-600 bg-white shadow-sm appearance-none">
+                                <option value="novo">Novo</option>
+                                <option value="reposicao">Reposição</option>
+                            </select>
+                        </div>
+
+                        <!-- Área de Upload de Foto -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mb-2">Foto do EPI</label>
+                            <!-- O input type="file" está oculto. O design tracejado atua como label clicável. -->
+                            <label class="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex justify-center items-center cursor-pointer hover:bg-gray-50 transition-colors">
+                                <span class="text-sm text-[#0056D2] font-medium">Anexe a imagem aqui</span>
+                                <!-- A tag 'capture="environment"' aciona a câmera traseira em celulares -->
+                                <input type="file" accept="image/*" capture="environment" class="hidden">
+                            </label>
+                        </div>
+
+                        <!-- Divisor Horizontal Leve -->
+                        <hr class="border-gray-100">
+
+                        <!-- Área de Assinatura Digital -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mb-2">Assinatura Digital</label>
+                            <!-- O elemento <canvas> é obrigatório aqui para que bibliotecas JS (como Signature Pad) possam registrar o traço do dedo ou mouse -->
+                            <div class="w-full border border-gray-300 rounded-lg overflow-hidden bg-white shadow-inner">
+                                <canvas id="signature-pad" class="w-full h-32 touch-none cursor-crosshair"></canvas>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Footer do Formulário (Botões alinhados à direita no Desktop) -->
+                <div class="mt-12 pt-6 flex flex-col sm:flex-row justify-end items-center gap-4">
+                    <button type="button" class="w-full sm:w-auto px-8 py-2.5 bg-gray-50 hover:bg-gray-100 text-[#0056D2] border border-gray-200 text-sm font-semibold rounded-md transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="w-full sm:w-auto px-8 py-2.5 bg-[#0056D2] hover:bg-blue-800 text-white text-sm font-semibold rounded-md shadow-sm transition-colors">
+                        Registrar Entrega
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+    </main>
+
+</body>
+</html>
