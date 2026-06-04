@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - EPI Control</title>
+
+    <link rel="stylesheet" href="assests/css/dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">
+            EPI Control
+        </div>
+
+        <nav>
+            <a href="dashboard.html" class="active">Dashboard</a>
+            <a href="epis.html">EPIs</a>
+            <a href="entregas.html">Entregas</a>
+            <a href="relatorios.html">Relatórios</a>
+            <a href="funcionarios.html">Funcionários</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h1>Dashboard</h1>
+                <p>Visão geral do sistema</p>
+            </div>
+
+            <div class="user-area">
+                <button class="icon-btn">⚙</button>
+                <button class="icon-btn">❔</button>
+                <div class="avatar">
+                    A
+                </div>
+            </div>
+        </header>
+
+        <section class="cards">
+
+            <div class="card">
+                <span>Total de EPIs</span>
+                <h2 id="totalEpis">0</h2>
+            </div>
+
+            <div class="card">
+                <span>Funcionários</span>
+                <h2 id="totalFuncionarios">0</h2>
+            </div>
+
+            <div class="card warning">
+                <span>Próximos do vencimento</span>
+                <h2 id="proximosVencimento">0</h2>
+            </div>
+
+            <div class="card danger">
+                <span>Vencidos</span>
+                <h2 id="vencidos">0</h2>
+            </div>
+
+        </section>
+
+        <section class="content-grid">
+
+            <div class="alerts">
+
+                <div class="section-title">
+                    Alertas
+                </div>
+
+                <div id="alertList" class="alert-list">
+
+                    <div class="alert warning">
+                        Capacete - vence em 10 dias
+                    </div>
+
+                    <div class="alert danger">
+                        Luva Térmica - vencida
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="actions">
+
+                <div class="section-title">
+                    Ações rápidas
+                </div>
+
+                <div class="action-buttons">
+
+                    <a href="entregas.html">
+                        Registrar Entrega
+                    </a>
+
+                    <a href="funcionarios.html">
+                        Novo Funcionário
+                    </a>
+
+                    <a href="relatorios.html">
+                        Gerar Relatório
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="./assets/js/api.js"></script>
+    <script src="./assets/js/dashboard.js"></script>
+
+</body>
+</html>
