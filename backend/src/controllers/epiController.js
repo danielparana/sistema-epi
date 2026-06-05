@@ -58,10 +58,16 @@ class EpiController {
         epi
       })
     } catch (error) {
+      console.error('ERRO AO CADASTRAR EPI:')
+      console.error(error)
+
       if (error.code === 'P2002') {
         return res.status(400).json({ error: 'Esse lote já existe' })
       }
-      return res.status(500).json({ error: 'Erro interno ao cadastrar EPI' })
+
+      return res.status(500).json({
+        error: error.message
+      })
     }
   }
 
