@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Funcionários - EPI Fácil</title>
+    <title>EPIs - EPI Fácil</title>
 
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -30,9 +30,9 @@
                 <div class="user-avatar" id="profileBtn" title="Perfil do Usuário"></div>
                 <div class="dropdown-menu dropdown-right" id="profileDropdown">
                     <div class="user-info-header">
-                        <strong>João Silva</strong>
-                        <span>Administrador</span>
-                    </div>
+                         <strong id="userName">Carregando...</strong>
+                         <span id="userRole">Usuário</span>
+                    </div>  
                     <hr>
                     <a href="#"><i class="fa-solid fa-user"></i> Meu Perfil</a>
                     <a href="login.html" class="logout-link"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
@@ -44,8 +44,8 @@
     <div class="sub-header">
         <nav class="nav-container">
             <a href="dashboard.html" class="nav-item">Dashboard</a>
-            <a href="funcionarios.html" class="nav-item active">Funcionários</a>
-            <a href="epis.html" class="nav-item">EPIs</a>
+            <a href="funcionarios.html" class="nav-item">Funcionários</a>
+            <a href="epis.html" class="nav-item active">EPIs</a>
             <a href="entregas.html" class="nav-item">Entregas</a>
             <a href="relatorios.html" class="nav-item">Relatórios</a>
         </nav>
@@ -53,38 +53,60 @@
 
     <main class="main-container">
         <section class="panel-section">
-            <h2 class="section-title">Cadastro de Funcionário</h2>
-            <form id="employeeForm" class="form-grid" style="margin-top: 20px;">
-                <input type="text" id="nome" class="input" placeholder="Nome" required>
-                <input type="text" id="cpf" class="input" placeholder="CPF (formato: 000.000.000-00)" required>
-                <input type="text" id="cargo" class="input" placeholder="Cargo" required>
+            <h2 class="section-title">Cadastro de EPI</h2>
+            <form id="epiForm" class="form-grid" style="margin-top: 20px;">
+                <input list="epiNames" id="nomeEpi" class="input" placeholder="Nome do EPI (escreva ou escolha sugestão)">
+                <input type="text" id="loteEpi" class="input" placeholder="Lote">
+                <textarea id="descricaoEpi" class="input form-full-width" placeholder="Descrição"></textarea>
+                <input type="number" id="quantidadeEpi" class="input" min="0" placeholder="Quantidade">
+                <input type="date" id="vencimentoEpi" class="input" placeholder="Data de vencimento">
                 <div class="form-actions form-full-width">
-                    <button type="submit" class="btn btn-primary" style="width:100%;">Cadastrar Funcionário</button>
+                    <button type="button" id="cancelEditBtn" class="btn btn-secondary" style="display:none;">Cancelar edição</button>
+                    <button type="submit" id="saveEpiBtn" class="btn btn-primary">Cadastrar EPI</button>
                 </div>
-                <small id="cpfError" style="color: red; grid-column: span 2; display: none;"></small>
             </form>
         </section>
 
         <section class="panel-section">
-            <h2 class="section-title">Funcionários Cadastrados</h2>
+            <h2 class="section-title">EPIs em Estoque</h2>
             <div style="overflow-x:auto; margin-top:20px;">
                 <table style="width:100%; border-collapse: collapse;">
                     <thead>
                         <tr>
                             <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">ID</th>
                             <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">Nome</th>
-                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">CPF</th>
-                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">Cargo</th>
+                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">Lote</th>
+                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">Descrição</th>
+                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">Vencimento</th>
+                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">Qtd Inicial</th>
+                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">Qtd Atual</th>
+                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">Data/Hora</th>
+                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="employeeTable"></tbody>
+                    <tbody id="epiTable"></tbody>
                 </table>
             </div>
         </section>
     </main>
 
+    <div class="modal-overlay hidden" id="historyModalOverlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h2 class="section-title" style="margin: 0;">Histórico de edição</h2>
+                    <p id="historyModalSubtitle" style="margin: 6px 0 0; color: #6b7280; font-size: 0.95rem;"></p>
+                </div>
+                <button type="button" class="close-modal" id="closeHistoryModal">×</button>
+            </div>
+            <div class="modal-body" id="historyModalContent">
+                <p class="muted-text">Selecione um EPI e clique em Histórico para ver as últimas alterações.</p>
+            </div>
+        </div>
+    </div>
+
     <script src="assets/js/api.js"></script>
     <script src="assets/js/dashboard.js"></script>
-    <script src="assets/js/funcionarios.js"></script>
+    <script src="assets/js/epis.js"></script>
 </body>
 </html>

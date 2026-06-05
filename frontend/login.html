@@ -3,84 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- Tailwind v4 -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    
-    <title>Login - EPI Fácil</title>
+    <title>Login - Sistema EPI</title>
+
+    <link rel="stylesheet" href="assets/css/auth.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<!-- Fundo cinza claro para destacar o card branco -->
-<body class="bg-[#4361ee] min-h-screen flex items-center justify-center p-4">
+<body>
 
-    <!-- Container do Card de Login -->
-    <!-- h-[500px] define uma altura fixa elegante para o desktop -->
-    <div class="bg-white w-full max-w-4xl rounded-xl shadow-lg overflow-hidden flex flex-col md:flex-row min-h-[500px]">
-        
-        <!-- Lado Esquerdo: Formulário -->
-        <!-- w-full no mobile, w-1/2 no desktop -->
-        <div class="w-full md:w-1/2 p-10 md:p-14 flex flex-col justify-center relative">
-            
-            <!-- Logo no topo esquerdo -->
-            <div class="absolute top-8 left-10 md:top-10 md:left-14">
-                <span class="text-[#0056D2] font-semibold text-lg tracking-tight">EPI Fácil</span>
-            </div>
+    <main class="login-container">
 
-            <!-- Saudação -->
-            <div class="mt-12 mb-8">
-                <h1 class="text-4xl font-bold text-gray-400 mb-1">Olá!</h1>
-                <p class="text-gray-400 text-sm font-medium">bem-vindo de volta</p>
-            </div>
+        <div class="login-card">
 
-            <!-- Formulário -->
-            <form action="#" method="POST" class="w-full max-w-sm">
-                
-                <!-- Input: Usuário -->
-                <div class="mb-5">
-                    <input 
-                        type="text" 
-                        placeholder="Usuário" 
-                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-[#0056D2] focus:ring-1 focus:ring-[#0056D2] text-gray-700 placeholder-gray-400 transition-colors"
+            <h1>Sistema EPI</h1>
+
+            <p>
+                Faça login para acessar a plataforma
+            </p>
+
+            <form id="loginForm">
+
+                <div class="form-group">
+                    <label>E-mail</label>
+
+                    <input
+                        type="email"
+                        id="email"
                         required
                     >
                 </div>
-                
-                <!-- Input: Senha -->
-                <div class="mb-2">
-                    <input 
-                        type="password" 
-                        placeholder="Senha" 
-                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-[#0056D2] focus:ring-1 focus:ring-[#0056D2] text-gray-700 placeholder-gray-400 transition-colors"
+
+                <div class="form-group">
+                    <label>Senha</label>
+
+                    <input
+                        type="password"
+                        id="password"
                         required
                     >
                 </div>
-                
-                <!-- Link: Esqueci a senha -->
-                <div class="flex justify-end mb-8">
-                    <a href="#" class="text-xs text-[#0056D2] hover:underline font-medium">
-                        Esqueci minha senha
-                    </a>
-                </div>
 
-                <!-- Botão Entrar -->
-                <!-- self-start alinha o botão à esquerda sem ocupar 100% da largura -->
-                <button 
-                    type="submit" 
-                    class="bg-[#0056D2] hover:bg-blue-800 text-white font-bold py-2.5 px-8 rounded-lg shadow-md transition-colors duration-200"
-                >
+                <button type="submit">
                     Entrar
                 </button>
-                
+
             </form>
+
+            <span id="message"></span>
+
         </div>
 
-        <!-- Lado Direito: Banner Azul -->
-        <!-- hidden esconde no celular, md:block exibe do tablet em diante -->
-        <div class="hidden md:block w-full md:w-1/2 bg-[#3f37c9]">
-            <!-- Este bloco está pronto para receber uma imagem de fundo (bg-image) 
-                 ou uma ilustração 3D centralizada no futuro -->
-        </div>
+    </main>
 
-    </div>
+   <script src="assets/js/api.js"></script>
+    <script src="assets/js/login.js"></script>
 
 </body>
 </html>

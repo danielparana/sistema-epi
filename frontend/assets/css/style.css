@@ -108,13 +108,19 @@ body{
 }
 
 .btn-secondary{
-    background:#fff;
-    border:1px solid #cbd5e1;
-    padding:16px 28px;
-    border-radius:12px;
-    font-weight:600;
-    cursor:pointer;
+    font-family: inherit;                /* Força o botão a usar a fonte 'Inter' do body */
+    background: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+    border: 1px solid rgb(0, 0, 0);
+    padding: 16px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: .3s;
 }
+
+
 
 .hero-image{
     display:flex;

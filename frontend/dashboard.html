@@ -1,123 +1,113 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - EPI Control</title>
-
-    <link rel="stylesheet" href="assests/css/dashboard.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Sistema de Controle de EPIs - EPI Fácil</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
 </head>
 <body>
 
-    <aside class="sidebar">
-        <div class="logo">
-            EPI Control
+    <header>
+    <div class="header-left">
+        <span class="logo-text">EPI Fácil</span>
+        <span class="system-title">Sistema de Controle de EPIs</span>
+    </div>
+    <div class="header-right">
+        <i class="fa-regular fa-circle-question header-icon" title="Ajuda"></i>
+        
+        <div class="dropdown-wrapper">
+            <i class="fa-solid fa-gear header-icon" id="settingsBtn" title="Configurações"></i>
+            <div class="dropdown-menu" id="settingsDropdown">
+                <a href="#"><i class="fa-solid fa-sliders"></i> Preferências</a>
+                <a href="#"><i class="fa-solid fa-lock"></i> Segurança</a>
+                <a href="#"><i class="fa-solid fa-database"></i> Backup de Dados</a>
+            </div>
         </div>
 
-        <nav>
-            <a href="dashboard.html" class="active">Dashboard</a>
-            <a href="epis.html">EPIs</a>
-            <a href="entregas.html">Entregas</a>
-            <a href="relatorios.html">Relatórios</a>
-            <a href="funcionarios.html">Funcionários</a>
+        <div class="dropdown-wrapper">
+            <div class="user-avatar" id="profileBtn" title="Perfil do Usuário"></div>
+            <div class="dropdown-menu dropdown-right" id="profileDropdown">
+                <div class="user-info-header">
+                    <strong>João Silva</strong>
+                    <span>Administrador</span>
+                </div>
+                <hr>
+                <a href="#"><i class="fa-solid fa-user"></i> Meu Perfil</a>
+                <a href="#" class="logout-link"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+    <div class="sub-header">
+        <nav class="nav-container">
+            <a href="#" class="nav-item active">Dashboard</a>
+            <a href="funcionarios.html" class="nav-item">Funcionários</a>
+            <a href="epis.html" class="nav-item">EPIs</a>
+            <a href="entregas.html" class="nav-item">Entregas</a>
+            <a href="relatorios.html" class="nav-item">Relatórios</a>
         </nav>
-    </aside>
+    </div>
 
-    <main class="main-content">
-
-        <header class="topbar">
-            <div>
-                <h1>Dashboard</h1>
-                <p>Visão geral do sistema</p>
+    <main class="main-container">
+        <section class="stats-grid">
+            <div class="stat-card">
+                <h2 class="stat-title">EPIs em Estoque</h2>
+                <span class="stat-value" id="totalEpis">0</span>
             </div>
-
-            <div class="user-area">
-                <button class="icon-btn">⚙</button>
-                <button class="icon-btn">❔</button>
-                <div class="avatar">
-                    A
-                </div>
+            <div class="stat-card">
+                <h2 class="stat-title">Funcionários Cadastrados</h2>
+                <span class="stat-value" id="totalFuncionarios">0</span>
             </div>
-        </header>
-
-        <section class="cards">
-
-            <div class="card">
-                <span>Total de EPIs</span>
-                <h2 id="totalEpis">0</h2>
+            <div class="stat-card">
+                <h2 class="stat-title">Próximos do Vencimento</h2>
+                <span class="stat-value" id="proximosVencimento">0</span>
             </div>
-
-            <div class="card">
-                <span>Funcionários</span>
-                <h2 id="totalFuncionarios">0</h2>
+            <div class="stat-card">
+                <h2 class="stat-title">Vencidos</h2>
+                <span class="stat-value" id="vencidos">0</span>
             </div>
-
-            <div class="card warning">
-                <span>Próximos do vencimento</span>
-                <h2 id="proximosVencimento">0</h2>
-            </div>
-
-            <div class="card danger">
-                <span>Vencidos</span>
-                <h2 id="vencidos">0</h2>
-            </div>
-
         </section>
 
-        <section class="content-grid">
-
-            <div class="alerts">
-
-                <div class="section-title">
-                    Alertas
+        <section class="panel-section">
+            <h2 class="section-title">Alertas</h2>
+            <div class="alert-list">
+                <div class="alert-item">
+                    <span class="status-dot yellow-dot"></span>
+                    <p class="alert-text">Luvas De Segurança Térmica Tátil Foam Ca 51248 Volkh vence em 5 dias</p>
                 </div>
-
-                <div id="alertList" class="alert-list">
-
-                    <div class="alert warning">
-                        Capacete - vence em 10 dias
-                    </div>
-
-                    <div class="alert danger">
-                        Luva Térmica - vencida
-                    </div>
-
+                <div class="alert-item">
+                    <span class="status-dot red-dot"></span>
+                    <p class="alert-text">Oculos de Solda Epi Mascara Articulavel Dupla Lente Soldador vence hoje</p>
                 </div>
-
+                <div class="alert-item">
+                    <span class="status-dot yellow-dot"></span>
+                    <p class="alert-text">Máscara Facial Respirador C/ Filtro Alltec Mastt 2001 Vo/ga</p>
+                </div>
             </div>
-
-            <div class="actions">
-
-                <div class="section-title">
-                    Ações rápidas
-                </div>
-
-                <div class="action-buttons">
-
-                    <a href="entregas.html">
-                        Registrar Entrega
-                    </a>
-
-                    <a href="funcionarios.html">
-                        Novo Funcionário
-                    </a>
-
-                    <a href="relatorios.html">
-                        Gerar Relatório
-                    </a>
-
-                </div>
-
-            </div>
-
         </section>
 
+        <section class="panel-section">
+            <h2 class="section-title">Ações Rápidas</h2>
+            <div class="quick-actions-container">
+                <button class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i> Registrar Entrega
+                </button>
+                <button class="btn btn-secondary">
+                    <i class="fa-solid fa-plus"></i> Cadastrar EPI
+                </button>
+                <button class="btn btn-secondary">
+                    Ver Relatórios
+                </button>
+            </div>
+        </section>
     </main>
 
-    <script src="./assets/js/api.js"></script>
-    <script src="./assets/js/dashboard.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/dashboard.js"></script>
 
 </body>
 </html>
