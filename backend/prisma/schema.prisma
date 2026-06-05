@@ -15,6 +15,8 @@ model User {
   passwordHash String
   createdAt    DateTime @default(now())
 
+  epiHistories  EpiHistory[]
+
 }
 
 model Employee {
@@ -34,14 +36,31 @@ model Epi {
 
   id         Int      @id @default(autoincrement())
   nome       String
-  lote       String
+  lote       String   @unique
+  descricao  String?
   quantidade Int
-  validade   DateTime
+  initialQuantidade Int
+  vencimento  DateTime?
   createdAt  DateTime @default(now())
 
   deliveries Delivery[]
   
+  epiHistories EpiHistory[]
+  
+}
 
+model EpiHistory {
+  id                 Int      @id @default(autoincrement())
+  epiId              Int
+  userId             Int
+  previousNome       String?
+  previousLote       String
+  previousDescricao  String?
+  previousQuantidade Int
+  createdAt          DateTime @default(now())
+
+  epi  Epi  @relation(fields: [epiId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Delivery {

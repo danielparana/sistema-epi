@@ -4,16 +4,16 @@ const prisma = require('../prisma/client')
 
 
 class AuthController {
-
   async login(req, res) {
+    const { email, password } = req.body
 
-    const {
-      email,
-      password
-    } = req.body
+    if (!email || !password) {
+      return res.status(400).json({
+        message: 'E-mail e senha são obrigatórios'
+      })
+    }
 
     try {
-
       const user = await prisma.user.findUnique({
         where: {
           email
@@ -21,19 +21,16 @@ class AuthController {
       })
 
       if (!user) {
-        return res.status(404).json({
-          message: 'Usuário não encontrado'
+        return res.status(401).json({
+          message: 'Usuário ou senha inválidos'
         })
       }
 
-      const passwordMatch = await bcrypt.compare(
-        password,
-        user.passwordHash
-      )
+      const passwordMatch = await bcrypt.compare(password, user.passwordHash)
 
       if (!passwordMatch) {
         return res.status(401).json({
-          message: 'Senha inválida'
+          message: 'Usuário ou senha inválidos'
         })
       }
 
@@ -52,15 +49,11 @@ class AuthController {
         message: 'Login realizado',
         token
       })
-
     } catch (error) {
-
       return res.status(500).json({
-        error: error.message
+        error: 'Erro interno ao realizar login'
       })
-
     }
-
   }
 
 }

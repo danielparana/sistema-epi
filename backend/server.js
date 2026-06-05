@@ -9,13 +9,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 1. MÉTRICAS DO DASHBOARD + ALERTAS
+
 app.get('/api/dashboard', async (req, res) => {
   try {
     const estoqueTotal = await prisma.epi.aggregate({ _sum: { quantidade: true } });
     const totalEntregas = await prisma.delivery.count();
 
-    // Alertas simulados baseados no banco real ou regras de negócio
+
     const alertas = [
       { id: 1, tipo: 'warning', texto: 'Luvas De Segurança Térmica Tátil Foam Ca 51248 Volkh vence em 5 dias' },
       { id: 2, tipo: 'danger', texto: 'Oculos de Solda Epi Mascara Articulavel Dupla Lente Soldador vence hoje' },
@@ -34,7 +34,7 @@ app.get('/api/dashboard', async (req, res) => {
   }
 });
 
-// 2. LISTAR FUNCIONÁRIOS (Para o Dropdown e Filtros)
+
 app.get('/api/funcionarios', async (req, res) => {
   try {
     const funcionarios = await prisma.employee.findMany({ orderBy: { nome: 'asc' } });
@@ -44,7 +44,7 @@ app.get('/api/funcionarios', async (req, res) => {
   }
 });
 
-// 3. CADASTRAR FUNCIONÁRIO
+
 app.post('/api/funcionarios', async (req, res) => {
   const { nome, cpf, cargo } = req.body;
   try {
@@ -57,7 +57,7 @@ app.post('/api/funcionarios', async (req, res) => {
   }
 });
 
-// 4. LISTAR EPIS
+
 app.get('/api/epis', async (req, res) => {
   try {
     const epis = await prisma.epi.findMany({ orderBy: { nome: 'asc' } });
@@ -67,7 +67,7 @@ app.get('/api/epis', async (req, res) => {
   }
 });
 
-// 5. REGISTRAR ENTREGA REAL
+
 app.post('/api/entregas', async (req, res) => {
   const { employeeId, epiId, quantidade } = req.body;
   try {
@@ -86,7 +86,7 @@ app.post('/api/entregas', async (req, res) => {
   }
 });
 
-// 6. BUSCAR HISTÓRICO DE ENTREGAS/RELATÓRIOS
+
 app.get('/api/entregas', async (req, res) => {
   try {
     const entregas = await prisma.delivery.findMany({

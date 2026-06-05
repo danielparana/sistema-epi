@@ -4,15 +4,13 @@ function authMiddleware(req, res, next) {
 
   const authHeader = req.headers.authorization
 
-  if (!authHeader) {
-
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({
-      error: 'Token não informado'
+      error: 'Token não informado ou formato inválido'
     })
-
   }
 
-  const token = authHeader.replace('Bearer ', '')
+  const token = authHeader.replace('Bearer ', '').trim()
 
   try {
 
