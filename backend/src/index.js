@@ -1,17 +1,5 @@
-const path = require('path')
 const dotenv = require('dotenv')
-
-dotenv.config({ path: path.resolve(__dirname, '../.env') })
-
-if (!process.env.JWT_SECRET) {
-  console.error('FATAL: JWT_SECRET não definido. Crie backend/.env com JWT_SECRET="seuSegredoJWT".')
-  process.exit(1)
-}
-
-if (!process.env.DATABASE_URL) {
-  console.error('FATAL: DATABASE_URL não definido. Configure backend/.env com DATABASE_URL.')
-  process.exit(1)
-}
+dotenv.config()
 
 const express = require('express')
 const cors = require('cors')
@@ -39,9 +27,6 @@ app.get('/', (req, res) => {
 
 app.get('/dashboard', authMiddleware, async (req, res) => {
   try {
-    const agora = new Date()
-    const proximos30Dias = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30)
-
     const estoqueTotal = await prisma.epi.aggregate({
       _sum: {
         quantidade: true
@@ -51,15 +36,12 @@ app.get('/dashboard', authMiddleware, async (req, res) => {
     const totalFuncionarios = await prisma.employee.count()
     const totalEntregas = await prisma.delivery.count()
 
-    const proximosVencimento = 0
-    const vencidos = 0
-
     return res.json({
       totalEpis: estoqueTotal._sum.quantidade || 0,
       totalFuncionarios,
       totalEntregas,
-      proximosVencimento,
-      vencidos
+      proximosVencimento: 0,
+      vencidos: 0
     })
   } catch (error) {
     return res.status(500).json({ error: error.message })
@@ -68,7 +50,6 @@ app.get('/dashboard', authMiddleware, async (req, res) => {
 
 app.use('/employees', employeeRoutes)
 app.use('/users', userRoutes)
-
 app.use('/auth', authRoutes)
 app.use('/epis', epiRoutes)
 app.use('/deliveries', deliveryRoutes)
