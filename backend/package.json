@@ -1,4 +1,4 @@
 "scripts": {
-  "dev": "nodemon src/index.js",
-  "start": "node src/index.js"
+  "dev": "nodemon backend/server.js",
+  "start": "node backend/server.js"
 }
