@@ -50,12 +50,38 @@ class AuthController {
         token
       })
     } catch (error) {
+      console.error('Login error:', error)
       return res.status(500).json({
         error: 'Erro interno ao realizar login'
       })
     }
   }
 
+  async me(req, res) {
+    try {
+      const user = await prisma.user.findUnique({
+        where: {
+          id: req.user.id
+        }
+      })
+
+      if (!user) {
+        return res.status(404).json({
+          error: 'Usuário não encontrado'
+        })
+      }
+
+      return res.json({
+        id: user.id,
+        name: user.name,
+        email: user.email
+      })
+    } catch (error) {
+      return res.status(500).json({
+        error: 'Erro interno ao obter usuário'
+      })
+    }
+  }
 }
     
 

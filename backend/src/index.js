@@ -1,4 +1,17 @@
-require('dotenv').config({ path: './.env' })
+const path = require('path')
+const dotenv = require('dotenv')
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') })
+
+if (!process.env.JWT_SECRET) {
+  console.error('FATAL: JWT_SECRET não definido. Crie backend/.env com JWT_SECRET="seuSegredoJWT".')
+  process.exit(1)
+}
+
+if (!process.env.DATABASE_URL) {
+  console.error('FATAL: DATABASE_URL não definido. Configure backend/.env com DATABASE_URL.')
+  process.exit(1)
+}
 
 const express = require('express')
 const cors = require('cors')
@@ -57,7 +70,6 @@ app.use('/employees', employeeRoutes)
 app.use('/users', userRoutes)
 
 app.use('/auth', authRoutes)
-app.use(authRoutes)
 app.use('/epis', epiRoutes)
 app.use('/deliveries', deliveryRoutes)
 

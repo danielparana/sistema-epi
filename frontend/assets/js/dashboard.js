@@ -12,6 +12,7 @@ try {
 
         const userNameElement = document.getElementById('userName')
         const userRoleElement = document.getElementById('userRole')
+        const profileBtn = document.getElementById('profileBtn')
 
         if (userNameElement) {
             userNameElement.textContent = user.name
@@ -19,6 +20,11 @@ try {
 
         if (userRoleElement) {
             userRoleElement.textContent = user.role || 'Usuário'
+        }
+
+        if (profileBtn && user.name) {
+            const firstLetter = user.name.charAt(0).toUpperCase()
+            profileBtn.textContent = firstLetter
         }
     }
 } catch (error) {
