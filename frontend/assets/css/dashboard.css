@@ -423,3 +423,82 @@ textarea.input {
 .dropdown-menu.show {
     display: block;
 }
+
+.lista-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.item-dashboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.item-dashboard strong {
+    flex: 1;
+}
+
+.item-dashboard span {
+    font-weight: bold;
+    min-width: 40px;
+    text-align: right;
+}
+
+.item-estoque {
+    background: #f8fafc;
+    border-left: 4px solid #3b82f6;
+}
+
+.item-warning {
+    background: #fef9c3;
+    border-left: 4px solid #facc15;
+}
+
+.item-danger {
+    background: #fee2e2;
+    border-left: 4px solid #ef4444;
+}
+
+.stat-card {
+    min-height: 280px;
+    overflow-y: auto;
+}
+
+.epi-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 10px;
+    margin-bottom: 8px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.estoque {
+    background-color: #e8f5e9;
+    border-left: 5px solid #4caf50;
+}
+
+.proximo {
+    background-color: #fff8e1;
+    border-left: 5px solid #ffc107;
+}
+
+.vencido {
+    background-color: #ffebee;
+    border-left: 5px solid #f44336;
+}
+
+.epi-card strong {
+    font-weight: 700;
+}

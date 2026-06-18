@@ -122,7 +122,13 @@ employeeForm.addEventListener("submit", async (e) => {
         })
 
         if (!response.ok) {
-            throw new Error("Erro ao cadastrar")
+            const erro = await response.json()
+
+            if (erro.error === "CPFf já cadastrado") {
+                alert("Já existe um funcionário cadastrado com esse CPF.")
+                return
+            }
+            throw new Error(erro.error || "Erro ao cadastrar")
         }
 
         employeeForm.reset();

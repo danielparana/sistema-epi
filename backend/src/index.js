@@ -1,6 +1,8 @@
 const dotenv = require('dotenv')
 dotenv.config()
 
+
+
 const express = require('express')
 const cors = require('cors')
 
@@ -27,24 +29,54 @@ app.get('/', (req, res) => {
 
 app.get('/dashboard', authMiddleware, async (req, res) => {
   try {
-    const estoqueTotal = await prisma.epi.aggregate({
-      _sum: {
-        quantidade: true
+    const hoje = new Date()
+
+    const daqui30Dias = new Date()
+    daqui30Dias.setDate(hoje.getDate() + 30)
+
+    const epis = await prisma.epi.findMany({
+      orderBy: {
+        nome: 'asc'
       }
     })
 
     const totalFuncionarios = await prisma.employee.count()
-    const totalEntregas = await prisma.delivery.count()
+
+    const proximosVencimento = await prisma.epi.findMany({
+      where: {
+        vencimento: {
+          gte: hoje,
+          lte: daqui30Dias
+        }
+      },
+      orderBy: {
+        vencimento: 'asc'
+      }
+    })
+
+    const vencidos = await prisma.epi.findMany({
+      where: {
+        vencimento: {
+          lt: hoje
+        }
+      },
+      orderBy: {
+        vencimento: 'asc'
+      }
+    })
 
     return res.json({
-      totalEpis: estoqueTotal._sum.quantidade || 0,
+      epis,
       totalFuncionarios,
-      totalEntregas,
-      proximosVencimento: 0,
-      vencidos: 0
+      proximosVencimento,
+      vencidos
     })
+
   } catch (error) {
-    return res.status(500).json({ error: error.message })
+    console.error(error)
+    return res.status(500).json({
+      error: error.message
+    })
   }
 })
 
