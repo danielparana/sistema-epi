@@ -16,110 +16,131 @@ async function loadUserInfo() {
 
         if (response.ok) {
             const user = await response.json();
-            const userNameElement = document.getElementById('userName');
-            const userRoleElement = document.getElementById('userRole');
+
+            const userNameElement = document.getElementById("userName");
+            const userRoleElement = document.getElementById("userRole");
+            const profileBtn = document.getElementById("profileBtn");
 
             if (userNameElement) {
                 userNameElement.textContent = user.name;
             }
 
             if (userRoleElement) {
-                userRoleElement.textContent = user.role || 'Administrador';
+                userRoleElement.textContent = user.role || "Administrador";
             }
+
+            if (profileBtn && user.name) {
+                profileBtn.textContent = user.name.charAt(0).toUpperCase();
+            }
+
         } else if (response.status === 401) {
-            localStorage.removeItem('token');
+            localStorage.removeItem("token");
             window.location.href = "index.html";
         }
+
     } catch (error) {
-        console.error('Erro ao carregar usuário:', error);
+        console.error("Erro ao carregar usuário:", error);
     }
 }
 
-// Carregar estatísticas do dashboard
+// Carregar dashboard
 async function loadDashboardStats() {
     try {
+
         const response = await fetch(`${API_URL}/dashboard`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
         });
 
-        if (response.ok) {
-            const data = await response.json();
-            
-            // Atualizar os cards
-            document.getElementById('totalEpis').textContent = data.estoque;
-            document.getElementById('totalFuncionarios').textContent = data.funcionarios;
-            document.getElementById('proximosVencimento').textContent = data.proximosVencimento;
-            document.getElementById('vencidos').textContent = data.vencidos;
-            
-            // Atualizar alertas
-            updateAlerts(data.alertas);
-        } else if (response.status === 401) {
-            localStorage.removeItem('token');
-            window.location.href = "index.html";
-        } else {
-            console.error('Erro ao carregar estatísticas');
+        if (!response.ok) {
+            throw new Error("Erro ao carregar dashboard");
         }
+
+        const data = await response.json();
+
+        // A quantidade de funcionários
+        document.getElementById("totalFuncionarios").textContent =
+            data.totalFuncionarios;
+
+        // A quantidade de EPIs em estoque
+        document.getElementById("listaEpis").innerHTML =
+            data.epis.length
+                ? data.epis.map(epi =>
+                    `
+                    <div class="epi-card estoque">
+                        <span>${epi.nome}</span>
+                        <strong>${epi.quantidade} un.</strong>
+                    </div>
+                    `
+                ).join("")
+                : "<div>Nenhum EPI cadastrado</div>";
+
+        // Os EPIs próximos do vencimento
+        document.getElementById("proximosVencimento").innerHTML =
+            data.proximosVencimento.length
+                ? data.proximosVencimento.map(epi => {
+                    const dataFormatada =
+                        new Date(epi.vencimento).toLocaleDateString("pt-BR");
+
+                    return `<div class="epi-card proximo">
+                            <span>${epi.nome}</span>
+                            <strong>${dataFormatada}</strong>
+                        </div>`;
+                }).join("")
+                : "<div>Nenhum EPI próximo do vencimento</div>";
+
+        // Os EPIs vencidos
+        document.getElementById("vencidos").innerHTML =
+            data.vencidos.length
+                ? data.vencidos.map(epi => {
+                    const dataFormatada =
+                        new Date(epi.vencimento).toLocaleDateString("pt-BR");
+
+                    return `<div class="epi-card vencido">
+                            <span>${epi.nome}</span>
+                            <strong>${dataFormatada}</strong>
+                        </div>`;
+                }).join("")
+                : "<div>Nenhum EPI vencido</div>";
+
     } catch (error) {
-        console.error('Erro ao carregar dashboard:', error);
+        console.error("Erro ao carregar dashboard:", error);
     }
 }
 
-
-function updateAlerts(alertas) {
-    const alertList = document.querySelector('.alert-list');
-    
-    if (!alertList) return;
-    
-    alertList.innerHTML = alertas.map(alerta => {
-        let dotClass = 'yellow-dot';
-        if (alerta.tipo === 'danger') dotClass = 'red-dot';
-        else if (alerta.tipo === 'info') dotClass = 'green-dot';
-        
-        return `
-            <div class="alert-item">
-                <span class="status-dot ${dotClass}"></span>
-                <p class="alert-text">${alerta.texto}</p>
-            </div>
-        `;
-    }).join('');
-}
-
-
+// Configurar ações rápidas
 function setupQuickActions() {
-    const btnRegistrarEntrega = document.querySelector('.btn-primary');
-    const btnCadastrarEPI = document.querySelectorAll('.btn-secondary')[0];
-    const btnVerRelatorios = document.querySelectorAll('.btn-secondary')[1];
-    
-    if (btnRegistrarEntrega) {
-        btnRegistrarEntrega.addEventListener('click', () => {
-            window.location.href = 'entregas.html';
+
+    const botoes = document.querySelectorAll(".btn");
+
+    if (botoes[0]) {
+        botoes[0].addEventListener("click", () => {
+            window.location.href = "entregas.html";
         });
     }
-    
-    if (btnCadastrarEPI) {
-        btnCadastrarEPI.addEventListener('click', () => {
-            window.location.href = 'epis.html';
+
+    if (botoes[1]) {
+        botoes[1].addEventListener("click", () => {
+            window.location.href = "epis.html";
         });
     }
-    
-    if (btnVerRelatorios) {
-        btnVerRelatorios.addEventListener('click', () => {
-            window.location.href = 'relatorios.html';
+
+    if (botoes[2]) {
+        botoes[2].addEventListener("click", () => {
+            window.location.href = "relatorios.html";
         });
     }
 }
 
-
+// Inicialização
 async function init() {
     await loadUserInfo();
     await loadDashboardStats();
     setupQuickActions();
-    
-    
+
+    // Atualiza a cada 30 segundos
     setInterval(loadDashboardStats, 30000);
 }
 
-// Executar inicialização
 init();

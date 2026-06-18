@@ -1,4 +1,5 @@
-require('dotenv').config({ path: './.env' })
+const dotenv = require('dotenv')
+dotenv.config()
 
 const express = require('express')
 const cors = require('cors')
@@ -26,9 +27,6 @@ app.get('/', (req, res) => {
 
 app.get('/dashboard', authMiddleware, async (req, res) => {
   try {
-    const agora = new Date()
-    const proximos30Dias = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30)
-
     const estoqueTotal = await prisma.epi.aggregate({
       _sum: {
         quantidade: true
@@ -38,15 +36,12 @@ app.get('/dashboard', authMiddleware, async (req, res) => {
     const totalFuncionarios = await prisma.employee.count()
     const totalEntregas = await prisma.delivery.count()
 
-    const proximosVencimento = 0
-    const vencidos = 0
-
     return res.json({
       totalEpis: estoqueTotal._sum.quantidade || 0,
       totalFuncionarios,
       totalEntregas,
-      proximosVencimento,
-      vencidos
+      proximosVencimento: 0,
+      vencidos: 0
     })
   } catch (error) {
     return res.status(500).json({ error: error.message })
@@ -55,9 +50,7 @@ app.get('/dashboard', authMiddleware, async (req, res) => {
 
 app.use('/employees', employeeRoutes)
 app.use('/users', userRoutes)
-
 app.use('/auth', authRoutes)
-app.use(authRoutes)
 app.use('/epis', epiRoutes)
 app.use('/deliveries', deliveryRoutes)
 
