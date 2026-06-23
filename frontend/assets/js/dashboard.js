@@ -77,30 +77,34 @@ async function loadDashboardStats() {
                 : "<div>Nenhum EPI cadastrado</div>";
 
         // Os EPIs próximos do vencimento
-        document.getElementById("proximosVencimento").innerHTML =
+        document.getElementById("listaProximos").innerHTML =
             data.proximosVencimento.length
                 ? data.proximosVencimento.map(epi => {
                     const dataFormatada =
                         new Date(epi.vencimento).toLocaleDateString("pt-BR");
 
-                    return `<div class="epi-card proximo">
-                            <span>${epi.nome}</span>
-                            <strong>${dataFormatada}</strong>
-                        </div>`;
+                    return `
+                        <div class="item-vencimento proximo">
+                            ${epi.nome}<br>
+                            <small>Vence em: ${dataFormatada}</small>
+                        </div>
+                    `;
                 }).join("")
                 : "<div>Nenhum EPI próximo do vencimento</div>";
 
         // Os EPIs vencidos
-        document.getElementById("vencidos").innerHTML =
+        document.getElementById("listaVencidos").innerHTML =
             data.vencidos.length
                 ? data.vencidos.map(epi => {
                     const dataFormatada =
                         new Date(epi.vencimento).toLocaleDateString("pt-BR");
 
-                    return `<div class="epi-card vencido">
-                            <span>${epi.nome}</span>
-                            <strong>${dataFormatada}</strong>
-                        </div>`;
+                    return `
+                        <div class="item-vencimento vencido">
+                            ${epi.nome}<br>
+                            <small>Venceu em: ${dataFormatada}</small>
+                        </div>
+                    `;
                 }).join("")
                 : "<div>Nenhum EPI vencido</div>";
 

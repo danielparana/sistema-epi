@@ -83,11 +83,19 @@ async function carregarTabelaEntregas() {
     const formattedDate = `${createdAt.toLocaleDateString('pt-BR')} ${createdAt.toLocaleTimeString('pt-BR')}`
     const row = document.createElement('tr')
     row.innerHTML = `
-      <td>${delivery.id}</td>
+      <td>#${delivery.id}</td>
       <td>${delivery.employee.nome}</td>
       <td>${delivery.epi.nome}</td>
-      <td>${delivery.epi.lote}</td>
-      <td>${delivery.quantidade}</td>
+      <td>
+          <span class="lote-badge">
+              ${delivery.epi.lote}
+          </span>
+      </td>
+      <td>
+          <span class="quantity-badge">
+              ${delivery.quantidade}
+          </span>
+      </td>
       <td>${formattedDate}</td>
     `
     deliveryTable.appendChild(row)

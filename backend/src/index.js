@@ -30,9 +30,11 @@ app.get('/', (req, res) => {
 app.get('/dashboard', authMiddleware, async (req, res) => {
   try {
     const hoje = new Date()
+    hoje.setHours(0, 0, 0, )
 
     const daqui30Dias = new Date()
     daqui30Dias.setDate(hoje.getDate() + 30)
+    daqui30Dias.setHours(23, 59, 59, 999)
 
     const epis = await prisma.epi.findMany({
       orderBy: {
@@ -64,6 +66,11 @@ app.get('/dashboard', authMiddleware, async (req, res) => {
         vencimento: 'asc'
       }
     })
+
+    console.log('Hoje:', hoje)
+    console.log('Daqui 30 dias:', daqui30Dias)
+    console.log('Próximos:', proximosVencimento)
+    console.log('Vencidos:', vencidos)
 
     return res.json({
       epis,
