@@ -1,5 +1,7 @@
 # Sistema EPI
 
+**Versão atual:** 2.0
+
 Sistema EPI é uma aplicação de controle de equipamentos de proteção individual (EPIs) com backend em Node.js, Express e Prisma, e frontend em páginas estáticas HTML/JavaScript.
 
 ## Visão Geral
@@ -296,6 +298,82 @@ Response exemplo:
 
 * O arquivo `frontend/assets/js/api.js` define a URL do backend.
 * As rotas `/employees`, `/epis`, `/deliveries` e `/dashboard` exigem o token JWT no header `Authorization`.
+
+---
+
+# Novidades da Versão 2.0
+
+A Versão 2.0 consolida as funcionalidades desenvolvidas pela equipe e apresenta melhorias implementadas durante a fase de integração do projeto.
+
+ ## Melhorias implementadas
+Dashboard reformulado com novos indicadores visuais.
+- Inclusão de painéis para:
+ - EPIs em Estoque
+ - Funcionários Cadastrados
+ - EPIs Próximos do Vencimento
+ - EPIs Vencidos
+- Melhorias na interface da tela de Funcionários.
+- Ajustes de layout e organização das páginas.
+- Correções realizadas durante o processo de integração (Merge) entre as funcionalidades desenvolvidas pela equipe.
+- Atualização da documentação do projeto.
+- Credenciais para Testes
+
+## Credenciais para Testes
+Para acessar o sistema durante os testes, utilize as seguintes credenciais:
+
+**E-mail**
+
+'fabricio@email.com'
+
+**Senha**
+
+'123456'
+
+> Essas credenciais são destinadas apenas para testes e desenvolvimento da aplicação.
+
+---
+
+## Configuração do Banco de Dados (Equipe)
+
+O projeto utiliza um banco de dados PostgreSQL hospedado no Supabase, compartilhado entre os integrantes da equipe para desenvolvimento e testes.
+
+Por motivos de segurança, como este repositório é público, as credenciais de acesso ao banco não são armazenadas no GitHub.
+
+Cada integrante deverá:
+
+Copiar o arquivo .env.example;
+Renomeá-lo para .env;
+Inserir a DATABASE_URL e demais configurações fornecidas pela equipe.
+
+A DATABASE_URL e outras credenciais deverão ser compartilhadas apenas entre os integrantes do grupo por um canal privado (WhatsApp, Discord ou outro meio acordado pela equipe).
+
+## Orientações para Desenvolvimento
+
+Antes de iniciar qualquer alteração no projeto, atualize sua cópia local:
+
+git pull origin main
+
+Após concluir uma funcionalidade:
+
+git add .
+git commit -m "Descrição da alteração"
+git push origin main
+
+Caso ocorram conflitos durante um merge, resolva todos os conflitos antes de realizar um novo commit.
+
+Observações
+O sistema foi desenvolvido para fins acadêmicos.
+O banco de dados compartilhado é destinado exclusivamente para desenvolvimento e testes da equipe.
+Evite alterar ou excluir registros utilizados por outros integrantes sem alinhamento prévio.
+Sempre mantenha seu repositório atualizado antes de iniciar novas implementações.
+Histórico de Versões
+Versão 2.0
+Integração das funcionalidades desenvolvidas pela equipe.
+Dashboard atualizado com novos indicadores.
+Melhorias na interface do sistema.
+Ajustes na tela de Funcionários.
+Correções realizadas após o processo de Merge.
+Atualização da documentação do projeto.
 
 ## Licença
 
