@@ -13,6 +13,11 @@ model User {
   email        String       @unique
   passwordHash String
   createdAt    DateTime     @default(now())
+  role         String?      @default("FUNCIONARIO")
+
+  employeeId   Int?         @unique
+  employee     Employee?    @relation(fields: [employeeId], references: [id])
+
   epiHistories EpiHistory[]
 }
 
@@ -22,7 +27,10 @@ model Employee {
   cpf        String     @unique
   cargo      String
   createdAt  DateTime   @default(now())
+
   deliveries Delivery[]
+
+  user       User?
 }
 
 model Epi {

@@ -618,3 +618,54 @@ textarea.input {
         grid-column: span 1;
     }
 }
+
+/* ===== TABELA DE RELATÓRIO ===== */
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    font-family: 'Inter', sans-serif;
+}
+
+/* Cabeçalho */
+.table thead {
+    background: #2f3e46;
+    color: #fff;
+}
+
+.table th {
+    padding: 14px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* Linhas */
+.table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Zebra (linhas alternadas) */
+.table tbody tr:nth-child(even) {
+    background: #f9fafb;
+}
+
+/* Hover */
+.table tbody tr:hover {
+    background: #eef6ff;
+    transition: 0.2s;
+}
+
+/* Última linha sem borda */
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
