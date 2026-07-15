@@ -19,13 +19,14 @@ class ReportController {
         where.dataEntrega = {}
 
         if (startDate) {
+          const inicio = new Date('${startDate}T00:00:00')
           where.dataEntrega.gte = new Date(startDate)
         }
 
         if (endDate) {
-          const finalDate = new Date(endDate)
-          finalDate.setHours(23, 59, 59, 999)
+          const finalDate = new Date(`${endDate}T23:59:59.999`)
           where.dataEntrega.lte = finalDate
+
         }
 
       }
@@ -40,6 +41,7 @@ class ReportController {
         where.epiId = Number(epiId)
       }
 
+      
       const reports = await prisma.delivery.findMany({
 
         where,

@@ -53,67 +53,97 @@
     </div>
 
     <main class="main-container">
-            <section class="stats-grid">
+         <section class="stats-grid">
 
             <div class="stat-card">
-                <h2 class="stat-title">📦 EPIs em Estoque</h2>
-                <div id="listaEpis"></div>
+                <h2 class="stat-title">📦 Estoque</h2>
+                <span class="stat-value" id="totalEstoque">0</span>
             </div>
 
-            <div class="stat-card">
-                <h2 class="stat-title">👷 Funcionários Cadastrados</h2>
-                <span class="stat-value" id="totalFuncionarios">0</span>
+            <div class="stat-card verde">
+                <h2 class="stat-title">🟢 +45 dias</h2>
+                <span class="stat-value" id="verde">0</span>
             </div>
 
-            <div class="stat-card">
-                <h2 class="stat-title">🟡 Próximos do Vencimento</h2>
-                <div id="listaProximos"></div>
+            <div class="stat-card amarelo">
+                <h2 class="stat-title">🟡 45 a 30 dias</h2>
+                <span class="stat-value" id="amarelo">0</span>
             </div>
 
-            <div class="stat-card">
+            <div class="stat-card laranja">
+                <h2 class="stat-title">🟠 Menos de 30 dias</h2>
+                <span class="stat-value" id="laranja">0</span>
+            </div>
+
+            <div class="stat-card vermelho">
                 <h2 class="stat-title">🔴 Vencidos</h2>
-                <div id="listaVencidos"></div>
+                <span class="stat-value" id="vermelho">0</span>
             </div>
 
+        </section>  
+
+        <section class="panel-section">
+            <h2 class="section-title">
+                ⚠ Alertas
+            </h2>
+
+            <div id="listaAlertas"></div>
         </section>
 
         <section class="panel-section">
-            <h2 class="section-title">Alertas</h2>
-            <div class="alert-list">
-                <div class="alert-item">
-                    <span class="status-dot yellow-dot"></span>
-                    <p class="alert-text">Luvas De Segurança Térmica Tátil Foam Ca 51248 Volkh vence em 5 dias</p>
-                </div>
-                <div class="alert-item">
-                    <span class="status-dot red-dot"></span>
-                    <p class="alert-text">Oculos de Solda Epi Mascara Articulavel Dupla Lente Soldador vence hoje</p>
-                </div>
-                <div class="alert-item">
-                    <span class="status-dot yellow-dot"></span>
-                    <p class="alert-text">Máscara Facial Respirador C/ Filtro Alltec Mastt 2001 Vo/ga</p>
-                </div>
-            </div>
+
+            <h2 class="section-title">
+                EPIs em Estoque
+            </h2>
+
+            <div id="listaEpis"></div>
+
         </section>
 
         <section class="panel-section">
             <h2 class="section-title">Ações Rápidas</h2>
             <div class="quick-actions-container">
-                <button class="btn btn-primary">
+                <button id="btnEntrega" class="btn btn-primary">
                     <i class="fa-solid fa-plus"></i> Registrar Entrega
                 </button>
                 <button class="btn btn-secondary">
                     <i class="fa-solid fa-plus"></i> Cadastrar EPI
                 </button>
-                <button class="btn btn-secondary">
+                <button id="btnRelatorio" class="btn btn-secondary">
                     Ver Relatórios
                 </button>
             </div>
         </section>
     </main>
 
+
+    <div id="modalOverlay" class="modal-overlay hidden">
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <h2 id="modalTitle">Título</h2>
+
+            <button id="closeModal" class="close-modal">
+                &times;
+            </button>
+
+        </div>
+
+        <div id="modalBody" class="modal-body">
+
+        </div>
+
+    </div>
+
+    </div> 
+
     <script src="assets/js/api.js"></script>
     <script src="assets/js/common.js"></script>
     <script src="assets/js/dashboard.js"></script>
+
+   
 
 </body>
 </html>

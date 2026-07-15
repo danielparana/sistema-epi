@@ -3,9 +3,13 @@ const router = require('express').Router()
 const deliveryController = require('../controllers/deliveryController')
 
 const authMiddleware = require('../middlewares/authMiddleware')
+const checkRole = require('../middlewares/checkRole')
 
-router.get('/', authMiddleware, deliveryController.list)
+router.use(authMiddleware)
 
-router.post('/', authMiddleware, deliveryController.create)
+
+router.get('/', checkRole(['ADMIN', 'GERENTE']), deliveryController.list)
+
+router.post('/', checkRole(['ADMIN', 'GERENTE']), deliveryController.create)
 
 module.exports = router

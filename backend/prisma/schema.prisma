@@ -13,12 +13,10 @@ model User {
   email        String       @unique
   passwordHash String
   createdAt    DateTime     @default(now())
-  role         String?      @default("FUNCIONARIO")
-
   employeeId   Int?         @unique
-  employee     Employee?    @relation(fields: [employeeId], references: [id])
-
+  role         String?      @default("FUNCIONARIO")
   epiHistories EpiHistory[]
+  employee     Employee?    @relation(fields: [employeeId], references: [id])
 }
 
 model Employee {
@@ -27,9 +25,8 @@ model Employee {
   cpf        String     @unique
   cargo      String
   createdAt  DateTime   @default(now())
-
+  active     Boolean    @default(true)
   deliveries Delivery[]
-
   user       User?
 }
 

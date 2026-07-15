@@ -105,6 +105,8 @@ async function carregarRelatorio() {
         params.append('epiId', epiSelect.value)
     }
 
+    console.log(params.toString())
+
     const response = await fetch(`${API_URL}/reports?${params.toString()}`, {
 
         headers: {

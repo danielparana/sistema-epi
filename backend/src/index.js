@@ -15,6 +15,7 @@ const authRoutes = require('./routes/authRoutes')
 const epiRoutes = require('./routes/epiRoutes')
 const deliveryRoutes = require('./routes/deliveryRoutes')
 const reportRoutes = require('./routes/reportRoutes')
+const dashboardRoutes = require('./routes/dashboardRoutes')
 
 const app = express()
 
@@ -28,65 +29,8 @@ app.get('/', (req, res) => {
   })
 })
 
-app.get('/dashboard', authMiddleware, async (req, res) => {
-  try {
-    const hoje = new Date()
-    hoje.setHours(0, 0, 0, )
 
-    const daqui30Dias = new Date()
-    daqui30Dias.setDate(hoje.getDate() + 30)
-    daqui30Dias.setHours(23, 59, 59, 999)
-
-    const epis = await prisma.epi.findMany({
-      orderBy: {
-        nome: 'asc'
-      }
-    })
-
-    const totalFuncionarios = await prisma.employee.count()
-
-    const proximosVencimento = await prisma.epi.findMany({
-      where: {
-        vencimento: {
-          gte: hoje,
-          lte: daqui30Dias
-        }
-      },
-      orderBy: {
-        vencimento: 'asc'
-      }
-    })
-
-    const vencidos = await prisma.epi.findMany({
-      where: {
-        vencimento: {
-          lt: hoje
-        }
-      },
-      orderBy: {
-        vencimento: 'asc'
-      }
-    })
-
-    console.log('Hoje:', hoje)
-    console.log('Daqui 30 dias:', daqui30Dias)
-    console.log('Próximos:', proximosVencimento)
-    console.log('Vencidos:', vencidos)
-
-    return res.json({
-      epis,
-      totalFuncionarios,
-      proximosVencimento,
-      vencidos
-    })
-
-  } catch (error) {
-    console.error(error)
-    return res.status(500).json({
-      error: error.message
-    })
-  }
-})
+app.use('/dashboard', dashboardRoutes)
 
 app.use('/employees', employeeRoutes)
 app.use('/users', userRoutes)
@@ -94,6 +38,7 @@ app.use('/auth', authRoutes)
 app.use('/epis', epiRoutes)
 app.use('/deliveries', deliveryRoutes)
 app.use('/reports', reportRoutes)
+app.use('/dashboard', dashboardRoutes)
 
 app.use((err, req, res, next) => {
   console.error(err)
