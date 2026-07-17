@@ -78,7 +78,7 @@ function verificarLembrete(data) {
    const dia = String(agora.getDate()).padStart(2, '0');
    const dataAtual = `${ano}-${mes}-${dia}`;
 
-   const chave = 'popup_${dataAtual}_${periodo}';
+   const chave = `popup_${dataAtual}_${periodo}`;
 
     console.log("Chave:", chave);
 
