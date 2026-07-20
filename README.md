@@ -1,60 +1,282 @@
-# Sistema EPI
+# Sistema EPI Fácil
+![Node.js](https://img.shields.io/badge/Node.js-22.x-green)
+![Express](https://img.shields.io/badge/Express-5.x-black)
+![Prisma](https://img.shields.io/badge/Prisma-ORM-blue)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
+![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-4.x-38BDF8)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow)
 
-**Versão atual:** 2.0
+**Versão atual:** 3.0
 
 Sistema EPI é uma aplicação de controle de equipamentos de proteção individual (EPIs) com backend em Node.js, Express e Prisma, e frontend em páginas estáticas HTML/JavaScript.
 
 ## Visão Geral
 
-O sistema permite:
-* Autenticação de usuários com JWT
-* Cadastro de funcionários
-* Cadastro e atualização de EPIs
-* Controle de estoque e entrega de EPIs
-* Histórico de edição de EPIs
+# ✨ Principais Funcionalidades
+
+## 🔐 Autenticação
+
+- Login utilizando JWT
+- Controle de acesso por perfil
+- Sessões protegidas
+
+- <img width="1359" height="677" alt="image" src="https://github.com/user-attachments/assets/8d2f9ec4-d941-4bfc-aaa9-a9e141e06755" />
+
+
+---
+
+## 👥 Funcionários
+
+- Cadastro
+- Alteração
+- Exclusão
+- Consulta
+- <img width="1360" height="687" alt="image" src="https://github.com/user-attachments/assets/e300bdfa-3eac-49f6-af6f-c2bae2ce001c" />
+
+
+---
+
+## 🦺 EPIs
+
+- Cadastro de equipamentos
+- Controle de estoque
+- Controle por lote
+- Controle de validade
+- Atualização automática do estoque após entregas
+- <img width="1361" height="686" alt="image" src="https://github.com/user-attachments/assets/23528979-b062-4b63-87c7-d98bbe301afc" />
+
+
+---
+
+## 📦 Entregas
+
+- Registro de entrega de EPIs
+- Histórico completo
+- Controle de quantidade entregue
+- <img width="1362" height="686" alt="image" src="https://github.com/user-attachments/assets/27142789-7bd9-42d9-a6c1-6a9bf30a7daa" />
+
+
+---
+
+## 📊 Dashboard Inteligente
+
+O Dashboard apresenta indicadores em tempo real:
+
+- 📦 Estoque Total
+- 🔴 EPIs vencidos
+- 🟠 EPIs próximos do vencimento (até 30 dias)
+- 🟡 EPIs em atenção (30 a 45 dias)
+- 🟢 EPIs dentro da validade
+
+Também apresenta:
+
+- Lista dos EPIs em estoque
+- Lista de alertas
+- Indicadores visuais por cores
+- Interface responsiva
+- <img width="1361" height="687" alt="image" src="https://github.com/user-attachments/assets/cc2b6aa6-a823-4559-9275-610cc2701f07" />
+
+
+---
+
+## 🚨 Sistema Inteligente de Alertas
+
+O sistema monitora automaticamente a validade dos EPIs.
+
+Os equipamentos são classificados em quatro níveis:
+
+🔴 Vencido
+
+🟠 Até 30 dias
+
+🟡 Entre 30 e 45 dias
+
+🟢 Acima de 45 dias
+
+Cada alerta apresenta:
+
+- Nome do EPI
+- Lote
+- Quantidade
+- Data de validade
+- Dias restantes para vencimento
+- Funcionários que receberam aquele lote
+- Data da entrega para cada funcionário
+- <img width="1348" height="656" alt="image" src="https://github.com/user-attachments/assets/a8674356-a95f-4f2d-8a9d-16bd6c32c427" />
+
+
+---
+
+## 🔔 Pop-up Inteligente
+
+Ao acessar o sistema, o usuário recebe um lembrete automático caso existam EPIs que necessitem atenção.
+
+O pop-up é exibido somente quando houver:
+
+- EPIs vencidos
+- EPIs próximos do vencimento
+- EPIs em atenção
+
+Os lembretes estão programados para ocorrer diariamente nos períodos:
+
+- 08:00
+- 11:40
+- 17:00
+
+Após ser fechado, o pop-up somente será exibido novamente no próximo período programado.
+
+---
+
+## 📄 Relatórios
+
+O sistema permite gerar relatórios filtrando por:
+
+- Funcionário
+- EPI
+- Período
+- <img width="1360" height="686" alt="image" src="https://github.com/user-attachments/assets/4666eabd-832a-4a78-ac02-6ee2bdd14ea2" />
+
+
+Também permite exportar para:
+
+- PDF
+- Excel (.xlsx)
+
+---
+
+## 👤 Controle de Permissões
+
+### Administrador
+
+- Controle total do sistema
+
+### Gerente
+
+- Cadastro de funcionários
+- Cadastro de EPIs
+- Registro de entregas
+- Emissão de relatórios
+
+### Funcionário
+
+- Consulta dos próprios EPIs
+- Consulta de estoque permitido
+
+# 📱 Interface Responsiva
+
+O sistema foi desenvolvido para utilização em:
+
+- Desktop
+- Tablets
+- Smartphones
+
+utilizando Tailwind CSS para adaptação automática da interface.
+
+
 
 ## Estrutura do Repositório
 
 ```bash
-sistema-epi/
-├── backend/
-│   ├── prisma/
-│   │   ├── migrations/
-│   │   └── schema.prisma
-│   ├── src/
-│   │   ├── controllers/
-│   │   ├── middlewares/
-│   │   ├── prisma/
-│   │   ├── routes/
-│   │   └── index.js
+├── backend
+│   ├── .env
 │   ├── .env.example
+│   ├── .gitignore
+│   ├── package-lock.json
 │   ├── package.json
-│   └── README.md
-├── frontend/
-│   ├── assets/
-│   │   ├── css/
-│   │   └── js/
+│   ├── prisma
+│   │   ├── migrations
+│   │   │   ├── 20260605200630_init
+│   │   │   │   └── migration.sql
+│   │   │   ├── 20260630185455_add_roles_and_employee_relation
+│   │   │   │   └── migration.sql
+│   │   │   ├── 20260701020131_add_employee_active
+│   │   │   │   └── migration.sql
+│   │   │   └── migration_lock.toml
+│   │   ├── schema.prisma
+│   │   └── seed.js
+│   ├── README.md
+│   ├── scripts
+│   │   └── check_epis.js
+│   ├── server.js
+│   ├── src
+│   │   ├── controllers
+│   │   │   ├── authController.js
+│   │   │   ├── dashboardController.js
+│   │   │   ├── deliveryController.js
+│   │   │   ├── employeeController.js
+│   │   │   ├── epiController.js
+│   │   │   ├── reportController.js
+│   │   │   └── userController.js
+│   │   ├── index.js
+│   │   ├── middlewares
+│   │   │   ├── authMiddleware.js
+│   │   │   ├── authorize.js
+│   │   │   └── checkRole.js
+│   │   ├── prisma
+│   │   │   └── client.js
+│   │   └── routes
+│   │       ├── authRoutes.js
+│   │       ├── dashboardRoutes.js
+│   │       ├── deliveryRoutes.js
+│   │       ├── employeeRoutes.js
+│   │       ├── epiRoutes.js
+│   │       ├── reportRoutes.js
+│   │       └── userRoutes.js
+│   └── teste.js
+├── frontend
+│   ├── assets
+│   │   ├── css
+│   │   │   ├── auth.css
+│   │   │   ├── dashboard.css
+│   │   │   ├── funcionarios.css
+│   │   │   └── style.css
+│   │   └── js
+│   │       ├── api.js
+│   │       ├── common.js
+│   │       ├── dashboard.js
+│   │       ├── entregas.js
+│   │       ├── epis.js
+│   │       ├── funcionarios.js
+│   │       ├── index.js
+│   │       ├── login.js
+│   │       └── report.js
 │   ├── dashboard.html
 │   ├── entregas.html
 │   ├── epis.html
 │   ├── funcionarios.html
 │   ├── index.html
 │   ├── login.html
-│   └── relatorios.html
-└── package.json
+│   ├── relatorios.html
+│   └── teste.js
+├── package-lock.json
+├── package.json
+└── README.md
+
 ```
 
 ## Tecnologias
 
-* Node.js
-* Express
-* Prisma ORM
-* PostgreSQL
-* JWT
-* bcryptjs
-* dotenv
-* CORS
-* Nodemon
+### Front-end
+
+- HTML5
+- JavaScript (ES6)
+- Tailwind CSS
+- Font Awesome
+
+### Back-end
+
+- Node.js
+- Express
+
+### Banco de Dados
+
+- PostgreSQL
+- Prisma ORM
+
+### Segurança
+
+- JWT
+- Bcrypt
 
 ## Requisitos
 
@@ -104,219 +326,7 @@ npm run dev
 
 O servidor deve ficar disponível em `http://localhost:3000`.
 
-## Setup do Frontend
 
-O frontend é composto por páginas estáticas em `frontend/`.
-
-1. Abra `frontend/index.html` em um navegador ou sirva a pasta `frontend/` com um servidor estático.
-2. O arquivo `frontend/assets/js/api.js` define a variável `API_URL`.
-3. Se estiver usando o backend local, ele já aponta para `http://localhost:3000`.
-4. Se for usar um domínio remoto, atualize `API_URL` adequadamente.
-
-## Rotas da API
-
-### Autenticação
-
-#### POST /auth/login
-
-Request:
-```json
-{
-	"email": "usuario@exemplo.com",
-	"password": "senha123"
-}
-```
-
-Response:
-```json
-{
-	"message": "Login realizado",
-	"token": "TOKEN_JWT"
-}
-```
-
-#### GET /auth/me
-Requer header `Authorization: Bearer TOKEN_JWT`.
-
-Response:
-```json
-{
-	"id": 1,
-	"name": "Usuário",
-	"email": "usuario@exemplo.com"
-}
-```
-
-### Usuários
-
-#### POST /users
-Cria um novo usuário.
-
-Request:
-```json
-{
-	"name": "Nome",
-	"email": "email@exemplo.com",
-	"password": "senha123"
-}
-```
-
-### Funcionários
-
-As rotas de funcionários são protegidas por JWT.
-
-#### GET /employees
-Lista todos os funcionários.
-
-#### POST /employees
-Cria funcionário.
-
-Request:
-```json
-{
-	"nome": "João",
-	"cpf": "12345678900",
-	"cargo": "Técnico"
-}
-```
-
-### EPIs
-
-As rotas de EPIs também são protegidas.
-
-#### GET /epis
-Lista todos os EPIs.
-
-#### POST /epis
-Cria um novo EPI.
-
-Request:
-```json
-{
-	"nome": "Capacete",
-	"lote": "L001",
-	"quantidade": 10,
-	"descricao": "Capacete de segurança",
-	"vencimento": "2026-12-31"
-}
-```
-
-#### PUT /epis/:id
-Atualiza um EPI.
-
-#### DELETE /epis/:id
-Remove um EPI sem entregas registradas.
-
-#### GET /epis/:id/history
-Retorna o histórico de edições do EPI.
-
-### Entregas
-
-#### GET /deliveries
-Lista todas as entregas.
-
-#### POST /deliveries
-Registra uma nova entrega e reduz o estoque do EPI.
-
-Request:
-```json
-{
-	"employeeId": 1,
-	"epiId": 2,
-	"quantidade": 3
-}
-```
-
-### Dashboard
-
-#### GET /dashboard
-Requer autenticação e retorna estatísticas básicas.
-
-Response exemplo:
-```json
-{
-	"totalEpis": 15,
-	"totalFuncionarios": 5,
-	"totalEntregas": 8,
-	"proximosVencimento": 0,
-	"vencidos": 0
-}
-```
-
-## Modelos de Dados
-
-### User
-* `id`
-* `name`
-* `email`
-* `passwordHash`
-
-### Employee
-* `id`
-* `nome`
-* `cpf`
-* `cargo`
-
-### Epi
-* `id`
-* `nome`
-* `lote`
-* `descricao`
-* `quantidade`
-* `initialQuantidade`
-* `vencimento`
-
-### Delivery
-* `id`
-* `employeeId`
-* `epiId`
-* `quantidade`
-* `dataEntrega`
-
-### EpiHistory
-* `id`
-* `epiId`
-* `userId`
-* `previousNome`
-* `previousLote`
-* `previousDescricao`
-* `previousQuantidade`
-* `createdAt`
-
-## Variáveis de Ambiente
-
-* `DATABASE_URL` - string de conexão do PostgreSQL
-* `JWT_SECRET` - segredo usado para assinar tokens JWT
-
-## Solução de Problemas
-
-* `500 Internal Server Error` no login geralmente indica configuração incorreta do `.env` ou conexão inválida ao banco de dados.
-* Verifique se `backend/.env` existe e contém `DATABASE_URL` e `JWT_SECRET` válidos.
-* Reinicie o backend após alterações em `.env`.
-
-## Observações
-
-* O arquivo `frontend/assets/js/api.js` define a URL do backend.
-* As rotas `/employees`, `/epis`, `/deliveries` e `/dashboard` exigem o token JWT no header `Authorization`.
-
----
-
-# Novidades da Versão 2.0
-
-A Versão 2.0 consolida as funcionalidades desenvolvidas pela equipe e apresenta melhorias implementadas durante a fase de integração do projeto.
-
- ## Melhorias implementadas
-Dashboard reformulado com novos indicadores visuais.
-- Inclusão de painéis para:
- - EPIs em Estoque
- - Funcionários Cadastrados
- - EPIs Próximos do Vencimento
- - EPIs Vencidos
-- Melhorias na interface da tela de Funcionários.
-- Ajustes de layout e organização das páginas.
-- Correções realizadas durante o processo de integração (Merge) entre as funcionalidades desenvolvidas pela equipe.
-- Atualização da documentação do projeto.
-- Credenciais para Testes
 
 ## Credenciais para Testes
 Para acessar o sistema durante os testes, utilize as seguintes credenciais:
@@ -367,6 +377,9 @@ O banco de dados compartilhado é destinado exclusivamente para desenvolvimento 
 Evite alterar ou excluir registros utilizados por outros integrantes sem alinhamento prévio.
 Sempre mantenha seu repositório atualizado antes de iniciar novas implementações.
 Histórico de Versões
+
+Versão 3.0
+
 Versão 2.0
 Integração das funcionalidades desenvolvidas pela equipe.
 Dashboard atualizado com novos indicadores.
@@ -374,6 +387,17 @@ Melhorias na interface do sistema.
 Ajustes na tela de Funcionários.
 Correções realizadas após o processo de Merge.
 Atualização da documentação do projeto.
+
+---
+
+# 👨‍💻 Autores
+
+**Daniel da Cruz Santos Paraná**
+**Débora Eduarda Schol**
+**Fabrício Torri**
+**Marcos Patrick Costa Campos**
+
+Projeto desenvolvido para o curso de **Análise e Desenvolvimento de Sistemas**.
 
 ## Licença
 
