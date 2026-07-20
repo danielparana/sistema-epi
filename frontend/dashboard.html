@@ -4,146 +4,181 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Controle de EPIs - EPI Fácil</title>
+    <!-- Fontes e Ícones -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <!-- TailwindCSS via CDN (Para desenvolvimento. Em produção, use o processo de build) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            500: '#0d54b4',
+                            600: '#0056c6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-900 min-h-screen font-sans antialiased">
 
-    <header>
-    <div class="header-left">
-        <span class="logo-text">EPI Fácil</span>
-        <span class="system-title">Sistema de Controle de EPIs</span>
-    </div>
-    <div class="header-right">
-        <i class="fa-regular fa-circle-question header-icon" title="Ajuda"></i>
+    <!-- Cabeçalho -->
+    <header class="bg-white h-auto md:h-16 px-6 py-4 md:py-0 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-200 gap-4 md:gap-0">
+        <div class="flex items-center gap-4">
+            <span class="text-brand-500 font-semibold text-xl">EPI Fácil</span>
+            <span class="text-slate-800 font-medium text-lg hidden sm:block">Sistema de Controle de EPIs</span>
+        </div>
         
-        <div class="dropdown-wrapper">
-            <i class="fa-solid fa-gear header-icon" id="settingsBtn" title="Configurações"></i>
-            <div class="dropdown-menu" id="settingsDropdown">
-                <a href="#"><i class="fa-solid fa-sliders"></i> Preferências</a>
-                <a href="#"><i class="fa-solid fa-lock"></i> Segurança</a>
-                <a href="#"><i class="fa-solid fa-database"></i> Backup de Dados</a>
-            </div>
-        </div>
-
-        <div class="dropdown-wrapper">
-            <div class="user-avatar" id="profileBtn" title="Perfil do Usuário"></div>
-            <div class="dropdown-menu dropdown-right" id="profileDropdown">
-                <div class="user-info-header">
-                    <strong id="userName">João Silva</strong>
-                    <span id="userRole">Administrador</span>
+        <div class="flex items-center justify-between w-full md:w-auto gap-6">
+            <button aria-label="Ajuda" class="text-brand-500 text-xl hover:text-brand-600 transition-colors">
+                <i class="fa-regular fa-circle-question"></i>
+            </button>
+            
+            <div class="relative group">
+                <button aria-label="Configurações" aria-haspopup="true" id="settingsBtn" class="text-brand-500 text-xl hover:text-brand-600 transition-colors">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+                <!-- O Dropdown será controlado via JS, por padrão fica escondido (hidden) -->
+                <div id="settingsDropdown" class="hidden absolute top-8 left-1/2 -translate-x-1/2 bg-white min-w-[200px] shadow-lg border border-slate-200 rounded-md z-50 py-2">
+                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-500"><i class="fa-solid fa-sliders"></i> Preferências</a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-500"><i class="fa-solid fa-lock"></i> Segurança</a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-500"><i class="fa-solid fa-database"></i> Backup de Dados</a>
                 </div>
-                <hr>
-                <a href="#"><i class="fa-solid fa-user"></i> Meu Perfil</a>
-                <a href="#" class="logout-link"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
+            </div>
+
+            <div class="relative group">
+                <button aria-label="Perfil do Usuário" aria-haspopup="true" id="profileBtn" class="w-10 h-10 rounded-full bg-brand-500 text-white font-semibold flex items-center justify-center hover:bg-brand-600 transition-colors">
+                    M
+                </button>
+                <div id="profileDropdown" class="hidden absolute top-12 right-0 bg-white min-w-[220px] shadow-lg border border-slate-200 rounded-md z-50 py-2">
+                    <div class="px-4 py-3 flex flex-col border-b border-slate-100">
+                        <strong id="userName" class="text-sm text-slate-900">Marcos</strong>
+                        <span id="userRole" class="text-xs text-slate-500">Administrador</span>
+                    </div>
+                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-500 mt-1"><i class="fa-solid fa-user"></i> Meu Perfil</a>
+                    <a id="logoutBtn"href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
+                </div>
             </div>
         </div>
+    </header>
+
+    <!-- Navegação Secundária -->
+    <!-- Navegação Principal (Bottom Bar no Mobile, Top Bar no Desktop) -->
+    
+
+    <!-- Área Principal -->
+    <main class="p-6 md:p-10 pb-24 md:pb-10 max-w-7xl mx-auto space-y-8">
+         
+        <!-- Indicadores (KPIs) -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-10">
+    <!-- 1. Estoque Geral -->
+    <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all">
+        <h2 class="text-slate-800 text-sm font-medium mb-3">📦 Estoque Geral</h2>
+        <span class="text-slate-900 text-4xl font-bold" id="totalEstoque">-</span>
     </div>
-</header>
 
-    <div class="sub-header">
-        <nav class="nav-container">
-            <a href="#" class="nav-item active">Dashboard</a>
-            <a href="funcionarios.html" class="nav-item">Funcionários</a>
-            <a href="epis.html" class="nav-item">EPIs</a>
-            <a href="entregas.html" class="nav-item">Entregas</a>
-            <a href="relatorios.html" class="nav-item">Relatórios</a>
-        </nav>
+    <!-- 2. Crítico: Vencidos -->
+    <div class="bg-white rounded-xl p-6 border border-slate-200 border-t-4 border-t-red-500 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all">
+        <h2 class="text-slate-800 text-sm font-medium mb-3">🔴 Vencidos</h2>
+        <span class="text-slate-900 text-4xl font-bold" id="vermelho">-</span>
     </div>
 
-    <main class="main-container">
-         <section class="stats-grid">
+    <!-- 3. Urgente: < 30 dias -->
+    <div class="bg-white rounded-xl p-6 border border-slate-200 border-t-4 border-t-orange-500 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all">
+        <h2 class="text-slate-800 text-sm font-medium mb-3">🟠 Até 30 dias</h2>
+        <span class="text-slate-900 text-4xl font-bold" id="laranja">-</span>
+    </div>
 
-            <div class="stat-card">
-                <h2 class="stat-title">📦 Estoque</h2>
-                <span class="stat-value" id="totalEstoque">0</span>
+    <!-- 4. Atenção: 45 a 30 dias -->
+    <div class="bg-white rounded-xl p-6 border border-slate-200 border-t-4 border-t-yellow-400 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all">
+        <h2 class="text-slate-800 text-sm font-medium mb-3">🟡 Entre 30 e 45 dias</h2>
+        <span class="text-slate-900 text-4xl font-bold" id="amarelo">-</span>
+    </div>
+
+    <!-- 5. Saudável: 45+ dias -->
+    <div class="bg-white rounded-xl p-6 border border-slate-200 border-t-4 border-t-green-500 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all">
+        <h2 class="text-slate-800 text-sm font-medium mb-3">🟢 Acima de 45 dias</h2>
+        <span class="text-slate-900 text-4xl font-bold" id="verde">-</span>
+    </div>
+</section> 
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Coluna Principal (Maior) -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Seção EPIs em Estoque -->
+                <section class="bg-white rounded-lg p-6 border border-slate-200 shadow-sm">
+                    <h2 class="text-slate-900 text-lg font-medium pb-4 border-b border-slate-200 mb-4">
+                        EPIs em Estoque
+                    </h2>
+                    <div id="listaEpis" class="min-h-[200px] flex flex-col gap-3">
+                        <!-- O JS injetará os itens aqui. -->
+                        <p class="text-slate-500 text-sm italic">Carregando dados do estoque...</p>
+                    </div>
+                </section>
             </div>
 
-            <div class="stat-card verde">
-                <h2 class="stat-title">🟢 +45 dias</h2>
-                <span class="stat-value" id="verde">0</span>
+            <!-- Coluna Lateral (Menor) -->
+            <div class="space-y-8">
+                <!-- Seção Alertas -->
+                <section class="bg-white rounded-lg p-6 border border-slate-200 shadow-sm">
+                    <h2 class="text-slate-900 text-lg font-medium pb-4 border-b border-slate-200 mb-4 flex items-center gap-2">
+                        <span class="text-red-500">⚠</span> Alertas
+                    </h2>
+                    <div id="listaAlertas" class="min-h-[100px] flex flex-col gap-3">
+                        <!-- O JS injetará os alertas aqui. -->
+                    </div>
+                </section>
+
+                <!-- Seção Ações Rápidas -->
+                <section class="bg-white rounded-lg p-6 border border-slate-200 shadow-sm">
+                    <h2 class="text-slate-900 text-lg font-medium pb-4 border-b border-slate-200 mb-4">Ações Rápidas</h2>
+                    <div class="flex flex-col gap-3 pt-2">
+                        <button id="btnEntrega" class="w-full flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 text-white font-medium py-3 px-4 rounded-md transition-colors">
+                            <i class="fa-solid fa-plus"></i> Registrar Entrega
+                        </button>
+                        <button class="w-full flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium py-3 px-4 rounded-md transition-colors">
+                            <i class="fa-solid fa-plus"></i> Cadastrar EPI
+                        </button>
+                        <button id="btnRelatorio" class="w-full flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium py-3 px-4 rounded-md transition-colors">
+                            Ver Relatórios
+                        </button>
+                    </div>
+                </section>
             </div>
+        </div>
 
-            <div class="stat-card amarelo">
-                <h2 class="stat-title">🟡 45 a 30 dias</h2>
-                <span class="stat-value" id="amarelo">0</span>
-            </div>
-
-            <div class="stat-card laranja">
-                <h2 class="stat-title">🟠 Menos de 30 dias</h2>
-                <span class="stat-value" id="laranja">0</span>
-            </div>
-
-            <div class="stat-card vermelho">
-                <h2 class="stat-title">🔴 Vencidos</h2>
-                <span class="stat-value" id="vermelho">0</span>
-            </div>
-
-        </section>  
-
-        <section class="panel-section">
-            <h2 class="section-title">
-                ⚠ Alertas
-            </h2>
-
-            <div id="listaAlertas"></div>
-        </section>
-
-        <section class="panel-section">
-
-            <h2 class="section-title">
-                EPIs em Estoque
-            </h2>
-
-            <div id="listaEpis"></div>
-
-        </section>
-
-        <section class="panel-section">
-            <h2 class="section-title">Ações Rápidas</h2>
-            <div class="quick-actions-container">
-                <button id="btnEntrega" class="btn btn-primary">
-                    <i class="fa-solid fa-plus"></i> Registrar Entrega
-                </button>
-                <button class="btn btn-secondary">
-                    <i class="fa-solid fa-plus"></i> Cadastrar EPI
-                </button>
-                <button id="btnRelatorio" class="btn btn-secondary">
-                    Ver Relatórios
-                </button>
-            </div>
-        </section>
     </main>
 
-
-    <div id="modalOverlay" class="modal-overlay hidden">
-
-    <div class="modal-card">
-
-        <div class="modal-header">
-
-            <h2 id="modalTitle">Título</h2>
-
-            <button id="closeModal" class="close-modal">
-                &times;
-            </button>
-
+    <!-- Modal Overlay -->
+    <div id="modalOverlay" class="fixed inset-0 bg-slate-900/60 hidden place-items-center p-4 md:p-6 z-[100] backdrop-blur-sm">
+        <!-- Modal Card -->
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl border border-slate-200 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-6 border-b border-slate-200 bg-slate-50">
+                <h2 id="modalTitle" class="text-xl font-semibold text-slate-900">Título</h2>
+                <button id="closeModal" aria-label="Fechar" class="text-slate-400 hover:text-slate-700 transition-colors text-2xl leading-none">
+                    &times;
+                </button>
+            </div>
+            <!-- Modal Body -->
+            <div id="modalBody" class="p-6 max-h-[70vh] overflow-y-auto">
+                <!-- Conteúdo injetado via JS -->
+            </div>
         </div>
-
-        <div id="modalBody" class="modal-body">
-
-        </div>
-
-    </div>
-
     </div> 
 
+    <!-- Scripts -->
     <script src="assets/js/api.js"></script>
     <script src="assets/js/common.js"></script>
     <script src="assets/js/dashboard.js"></script>
-
-   
 
 </body>
 </html>

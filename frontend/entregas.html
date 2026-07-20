@@ -5,103 +5,158 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Entregas - EPI Fácil</title>
 
-    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <!-- Fontes e Ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- TailwindCSS via CDN (Para desenvolvimento) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            500: '#0d54b4',
+                            600: '#0056c6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-    <header>
-        <div class="header-left">
-            <span class="logo-text">EPI Fácil</span>
-            <span class="system-title">Sistema de Controle de EPIs</span>
+<body class="bg-slate-50 text-slate-900 min-h-screen font-sans antialiased relative">
+
+    <!-- Cabeçalho (Padronizado com Acessibilidade e Mobile-First) -->
+    <header class="bg-white h-auto md:h-16 px-6 py-4 md:py-0 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-200 gap-4 md:gap-0">
+        <div class="flex items-center gap-4">
+            <span class="text-brand-500 font-semibold text-xl">EPI Fácil</span>
+            <span class="text-slate-800 font-medium text-lg hidden sm:block">Sistema de Controle de EPIs</span>
         </div>
-        <div class="header-right">
-            <i class="fa-regular fa-circle-question header-icon" title="Ajuda"></i>
-            <div class="dropdown-wrapper">
-                <i class="fa-solid fa-gear header-icon" id="settingsBtn" title="Configurações"></i>
-                <div class="dropdown-menu" id="settingsDropdown">
-                    <a href="#"><i class="fa-solid fa-sliders"></i> Preferências</a>
-                    <a href="#"><i class="fa-solid fa-lock"></i> Segurança</a>
-                    <a href="#"><i class="fa-solid fa-database"></i> Backup de Dados</a>
+        
+        <div class="flex items-center justify-between w-full md:w-auto gap-6">
+            <button aria-label="Ajuda" class="text-brand-500 text-xl hover:text-brand-600 transition-colors">
+                <i class="fa-regular fa-circle-question"></i>
+            </button>
+            
+            <div class="relative group">
+                <button aria-label="Configurações" aria-haspopup="true" id="settingsBtn" class="text-brand-500 text-xl hover:text-brand-600 transition-colors">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+                <div id="settingsDropdown" class="hidden absolute top-8 left-1/2 -translate-x-1/2 bg-white min-w-[200px] shadow-lg border border-slate-200 rounded-md z-50 py-2">
+                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-500"><i class="fa-solid fa-sliders"></i> Preferências</a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-500"><i class="fa-solid fa-lock"></i> Segurança</a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-500"><i class="fa-solid fa-database"></i> Backup de Dados</a>
                 </div>
             </div>
-            <div class="dropdown-wrapper">
-                <div class="user-avatar" id="profileBtn" title="Perfil do Usuário"></div>
-                <div class="dropdown-menu dropdown-right" id="profileDropdown">
-                    <div class="user-info-header">
-                        <strong id="userName">João Silva</strong>
-                        <span id="userRole">Administrador</span>
+
+            <div class="relative group">
+                <button aria-label="Perfil do Usuário" aria-haspopup="true" id="profileBtn" class="w-10 h-10 rounded-full bg-brand-500 text-white font-semibold flex items-center justify-center hover:bg-brand-600 transition-colors">
+                    M
+                </button>
+                <div id="profileDropdown" class="hidden absolute top-12 right-0 bg-white min-w-[220px] shadow-lg border border-slate-200 rounded-md z-50 py-2">
+                    <div class="px-4 py-3 flex flex-col border-b border-slate-100">
+                        <strong id="userName" class="text-sm text-slate-900">Marcos</strong>
+                        <span id="userRole" class="text-xs text-slate-500">Administrador</span>
                     </div>
-                    <hr>
-                    <a href="#"><i class="fa-solid fa-user"></i> Meu Perfil</a>
-                    <a href="login.html" class="logout-link"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-500 mt-1"><i class="fa-solid fa-user"></i> Meu Perfil</a>
+                    <a href="login.html" class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
                 </div>
             </div>
         </div>
     </header>
 
-    <div class="sub-header">
-        <nav class="nav-container">
-            <a href="dashboard.html" class="nav-item">Dashboard</a>
-            <a href="funcionarios.html" class="nav-item">Funcionários</a>
-            <a href="epis.html" class="nav-item">EPIs</a>
-            <a href="entregas.html" class="nav-item active">Entregas</a>
-            <a href="relatorios.html" class="nav-item">Relatórios</a>
-        </nav>
-    </div>
+    <!-- O menu de navegação dinâmica será injetado automaticamente aqui pelo seu common.js -->
 
-    <main class="main-container">
-        <section class="panel-section">
-            <h2 class="section-title">Registrar Entrega</h2>
-            <form id="deliveryForm" class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px;">
-                <div>
-                    <label class="text-sm font-medium text-gray-700">Funcionário</label>
-                    <select id="employeeSelect" class="input" required>
+    <!-- Área Principal (Modificado: pb-24 impede a sobreposição da Bottom Bar no Mobile) -->
+    <main class="p-6 md:p-10 pb-24 md:pb-10 max-w-7xl mx-auto space-y-8">
+        
+        <!-- Painel: Registrar Entrega -->
+        <section class="bg-white rounded-xl p-6 md:p-8 border border-slate-200 shadow-sm">
+            <h2 class="text-slate-900 text-xl font-medium pb-4 border-b border-slate-200 mb-6">
+                Registrar Entrega
+            </h2>
+            
+            <form id="deliveryForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Select Funcionário -->
+                <div class="w-full">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Funcionário</label>
+                    <select id="employeeSelect" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all bg-white shadow-sm" required>
                         <option value="">Carregando funcionários...</option>
                     </select>
                 </div>
-                <div>
-                    <label class="text-sm font-medium text-gray-700">EPI</label>
-                    <select id="epiSelect" class="input" required>
+
+                <!-- Select EPI -->
+                <div class="w-full">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">EPI</label>
+                    <select id="epiSelect" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all bg-white shadow-sm" required>
                         <option value="">Carregando EPIs...</option>
                     </select>
                 </div>
-                <div>
-                    <label class="text-sm font-medium text-gray-700">Lote</label>
-                    <input id="selectedLot" type="text" class="input" placeholder="Lote selecionado" readonly>
+
+                <!-- Input Lote (Apenas leitura) -->
+                <div class="w-full">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Lote</label>
+                    <input id="selectedLot" type="text" class="w-full p-3 border border-slate-200 rounded-lg bg-slate-50 text-slate-500 focus:outline-none cursor-not-allowed shadow-sm" placeholder="Lote selecionado" readonly>
                 </div>
-                <div>
-                    <label class="text-sm font-medium text-gray-700">Quantidade</label>
-                    <input id="quantityInput" type="number" min="1" value="1" class="input" required>
+
+                <!-- Input Quantidade -->
+                <div class="w-full">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Quantidade</label>
+                    <input id="quantityInput" type="number" min="1" value="1" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all shadow-sm" required>
                 </div>
-                <div style="grid-column: span 2; display:flex; justify-content:flex-end; gap:10px; align-items:center;">
-                    <span id="stockInfo" style="color:#6b7280; font-size:0.95rem;"></span>
-                    <button type="submit" class="btn btn-primary">Registrar Entrega</button>
+
+                <!-- Ações e Validação de Estoque -->
+                <div class="md:col-span-2 flex flex-col sm:flex-row justify-end items-center gap-4 mt-2 pt-4">
+                    <span id="stockInfo" class="text-slate-500 text-sm font-medium w-full sm:w-auto text-center sm:text-right min-h-[20px]"></span>
+                    
+                    <button type="submit" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-medium py-3 px-6 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check"></i> Registrar Entrega
+                    </button>
                 </div>
             </form>
         </section>
 
-        <section class="panel-section">
-            <h2 class="section-title">Entregas registradas</h2>
-            <div style="overflow-x:auto; margin-top:20px;">
-                <table class="delivery-table">
-                    <thead>
+        <!-- Painel: Histórico de Entregas -->
+        <section class="bg-white rounded-xl p-6 md:p-8 border border-slate-200 shadow-sm">
+            <h2 class="text-slate-900 text-xl font-medium pb-4 border-b border-slate-200 mb-6">
+                Entregas Registradas
+            </h2>
+            
+            <!-- Wrapper com overflow para proteger tabelas no mobile -->
+            <div class="w-full overflow-x-auto rounded-lg md:border md:border-slate-200 md:shadow-sm">
+                <!-- Modificado: md:min-w-[800px] para liberar os cards no celular -->
+                <table class="w-full text-left border-collapse md:min-w-[800px] whitespace-nowrap">
+                    <!-- Modificado: hidden md:table-header-group -->
+                    <thead class="hidden md:table-header-group bg-slate-800 text-white">
                         <tr>
-                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">ID</th>
-                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">Funcionário</th>
-                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">EPI</th>
-                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">Lote</th>
-                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">Quantidade</th>
-                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">Data/Hora</th>
+                            <th class="p-4 text-sm font-semibold tracking-wide">ID</th>
+                            <th class="p-4 text-sm font-semibold tracking-wide">Funcionário</th>
+                            <th class="p-4 text-sm font-semibold tracking-wide">EPI</th>
+                            <th class="p-4 text-sm font-semibold tracking-wide">Lote</th>
+                            <th class="p-4 text-sm font-semibold tracking-wide">Quantidade</th>
+                            <th class="p-4 text-sm font-semibold tracking-wide">Data/Hora</th>
                         </tr>
                     </thead>
-                    <tbody id="deliveryTable"></tbody>
+                    <tbody id="deliveryTable" class="md:divide-y md:divide-slate-200 bg-transparent md:bg-white">
+                        <!-- O JS injetará as linhas (<tr>) aqui -->
+                        <tr>
+                            <td colspan="6" class="p-6 text-center text-sm text-slate-500 italic border-b-0">
+                                Carregando histórico de entregas...
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </section>
     </main>
 
+    <!-- Scripts -->
     <script src="assets/js/api.js"></script>
     <script src="assets/js/common.js"></script>
     <script src="assets/js/entregas.js"></script>

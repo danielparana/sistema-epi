@@ -3,60 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EPI Fácil</title>
+    <title>EPI Fácil - Gestão Inteligente de Equipamentos</title>
 
-    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Fontes e Ícones -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- TailwindCSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            500: '#0d54b4',
+                            600: '#0056c6',
+                            700: '#00439c',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-900 min-h-screen font-sans antialiased flex flex-col">
 
-    <header class="header">
-        <div class="container">
-            <div class="logo">
+    <!-- Cabeçalho Institucional -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#" aria-label="Página Inicial EPI Fácil" class="flex items-center gap-2 text-brand-600 font-bold text-2xl tracking-tight">
+                <i class="fa-solid fa-shield-halved"></i>
                 EPI Fácil
-            </div>
+            </a>
 
+            <!-- Navegação -->
             <nav>
-                <a href="login.html" class="btn-login">
-                    Entrar
+                <a href="login.html" class="inline-flex items-center justify-center px-6 py-2.5 text-sm font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg transition-colors border border-brand-200">
+                    <i class="fa-solid fa-right-to-bracket mr-2"></i> Entrar
                 </a>
             </nav>
         </div>
     </header>
 
-    <main class="hero">
-        <div class="container hero-content">
-
-            <div class="hero-text">
+    <!-- Seção Hero (Destaque Principal) -->
+    <main class="flex-grow flex items-center">
+        <div class="max-w-7xl mx-auto px-6 py-16 md:py-24 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            
+            <!-- Coluna de Texto -->
+            <div class="flex flex-col space-y-8 text-center lg:text-left">
                 
-                <h1>
-                    Controle e monitore equipamentos de proteção
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight tracking-tight">
+                    Controle e monitore <span class="text-brand-600">equipamentos de proteção</span>
                 </h1>
 
-                <p>
-                    Gerencie entregas, funcionários, relatórios e vencimentos
-                    em uma única plataforma.
+                <p class="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                    Gerencie entregas, controle funcionários, gere relatórios precisos e acompanhe vencimentos em uma única plataforma automatizada.
                 </p>
 
-                <div class="hero-actions">
-                    <a href="login.html" class="btn-primary">
+                <!-- Botões de Ação (Empilhados no mobile, lado a lado no desktop) -->
+                <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
+                    <a href="login.html" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-base font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-lg shadow-brand-500/30 transition-all hover:-translate-y-0.5">
                         Acessar Sistema
                     </a>
 
-                    <button class="btn-secondary">
+                    <button type="button" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-base font-medium text-slate-700 bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 rounded-xl transition-all">
                         Solicitar Demonstração
                     </button>
                 </div>
             </div>
 
-            <div class="hero-image">
-                <div class="image-placeholder"></div>
+            <!-- Coluna da Imagem / Interface Mockup -->
+            <div class="w-full relative group">
+                <!-- Efeito visual de fundo (Glow) -->
+                <div class="absolute -inset-1 bg-gradient-to-r from-brand-400 to-blue-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+                
+                <!-- Placeholder de Imagem -->
+                <div class="relative w-full aspect-[4/3] md:aspect-video lg:aspect-square xl:aspect-[4/3] bg-slate-100 rounded-2xl border border-slate-200 shadow-xl overflow-hidden flex flex-col items-center justify-center text-slate-400">
+                    <i class="fa-solid fa-laptop-code text-6xl md:text-8xl mb-4 text-slate-300"></i>
+                    <span class="text-sm md:text-base font-medium text-slate-500">Preview do Dashboard (Insira sua imagem aqui)</span>
+                </div>
             </div>
 
         </div>
     </main>
 
-<script src="assets/js/index.js"></script>
+    <script src="assets/js/index.js"></script>
 </body>
 </html>

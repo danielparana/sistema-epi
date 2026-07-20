@@ -140,59 +140,78 @@ function renderizarTabela(reports) {
     }
 
     let html = `
-        <table class="table">
+        <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
 
-            <thead>
+        <table class="table min-w-full divide-y divide-slate-200">
 
-                <tr>
-                    <th>Data</th>
-                    <th>Funcionário</th>
-                    <th>EPI</th>
-                    <th>Lote</th>
-                    <th>Quantidade</th>
-                </tr>
+        <thead class="bg-slate-100">
 
-            </thead>
+        <tr>
 
-            <tbody>
-    `
+        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+        Data
+        </th>
+
+        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+        Funcionário
+        </th>
+
+        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+        EPI
+        </th>
+
+        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+        Lote
+        </th>
+
+        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider">
+        Quantidade
+        </th>
+
+        </tr>
+
+        </thead>
+
+        <tbody class="divide-y divide-slate-200 bg-white">
+        `;
 
     reports.forEach(report => {
 
         const data = new Date(report.dataEntrega)
 
         html += `
-            <tr>
+            <tr class="hover:bg-slate-50 transition">
 
-                <td>
-                    ${data.toLocaleDateString('pt-BR')}
-                </td>
+            <td class="px-4 py-3">
+            ${data.toLocaleDateString('pt-BR')}
+            </td>
 
-                <td>
-                    ${report.employee.nome}
-                </td>
+            <td class="px-4 py-3">
+            ${report.employee.nome}
+            </td>
 
-                <td>
-                    ${report.epi.nome}
-                </td>
+            <td class="px-4 py-3 font-medium">
+            ${report.epi.nome}
+            </td>
 
-                <td>
-                    ${report.epi.lote}
-                </td>
+            <td class="px-4 py-3">
+            ${report.epi.lote}
+            </td>
 
-                <td>
-                    ${report.quantidade}
-                </td>
+            <td class="px-4 py-3 text-center">
+            ${report.quantidade}
+            </td>
 
             </tr>
-        `
+            `;
 
     })
 
     html += `
             </tbody>
+            </table>
         </table>
-    `
+    `;
 
     reportResult.innerHTML = html
 

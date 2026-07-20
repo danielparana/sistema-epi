@@ -308,23 +308,28 @@ async function loadDashboard() {
                 data.alertas.map(alerta => {
 
                     let cor = "";
+                    let icone = "";
 
                     switch (alerta.status) {
 
                         case "vermelho":
-                            cor = "red";
+                             cor = "border-red-500 bg-red-50";
+                            icone = "🔴";
                             break;
 
                         case "laranja":
-                            cor = "orange";
+                            cor = "border-orange-500 bg-orange-50";
+                            icone = "🟠";
                             break;
 
                         case "amarelo":
-                            cor = "yellow";
+                            cor = "border-yellow-500 bg-yellow-50";
+                            icone = "🟡";
                             break;
 
                         default:
-                            cor = "green";
+                            cor = "border-green-500 bg-green-50";
+                            icone = "🟢";
 
                     }
 
@@ -337,32 +342,50 @@ async function loadDashboard() {
 
                     return `
                          <div
-                            class="alert-card ${alerta.status}"
                             onclick="abrirDetalhesAlerta(${alerta.id})"
+                            class="
+                                cursor-pointer
+                                rounded-lg
+                                border-l-4
+                                ${cor}
+                                p-4
+                                hover:shadow-md
+                                transition-all
+                            "
                         >
 
-                            <h3>${alerta.nome}</h3>
+                            <div class="flex justify-between items-start">
 
-                            <p>
-                                <strong>Lote:</strong> ${alerta.lote}
-                            </p>
+                                <div>
 
-                            <p>
-                                <strong>Quantidade:</strong> ${alerta.quantidade}
-                            </p>
+                                    <h3 class="font-semibold text-slate-800">
+                                        ${icone} ${alerta.nome}
+                                    </h3>
 
-                            <p>
-                                <strong>Vencimento:</strong>
-                                ${new Date(alerta.vencimento).toLocaleDateString("pt-BR")}
-                            </p>
+                                    <p class="text-sm text-slate-600">
+                                        Lote ${alerta.lote}
+                                    </p>
 
-                            <p>
-                                <strong>Funcionários:</strong>
-                                ${funcionarios}
-                            </p>
+                                </div>
+
+                            </div>
+
+                            <div class="mt-3 text-sm text-slate-600">
+
+                                <p>
+                                    <strong>Quantidade:</strong>
+                                    ${alerta.quantidade}
+                                </p>
+
+                                <p>
+                                    <strong>Validade:</strong>
+                                    ${new Date(alerta.vencimento).toLocaleDateString("pt-BR")}
+                                </p>
+
+                            </div>
 
                         </div>
-                    `;
+                        `;
 
                 }).join("");
 
@@ -413,25 +436,77 @@ async function loadDashboard() {
 
                 return `
 
-                     <div class="epi-card ${status}" onclick="mostrarDetalhesEpi(${epi.id})">
+                     <div
+                        onclick="mostrarDetalhesEpi(${epi.id})"
+                        class="
+                            bg-white
+                            border
+                            border-slate-200
+                            rounded-xl
+                            p-4
+                            cursor-pointer
+                            hover:shadow-lg
+                            hover:-translate-y-1
+                            transition-all
+                            duration-200
+                        "
+                    >
 
-                        <div>
+                        <div class="flex justify-between items-start">
 
-                            <strong>${icone} ${epi.nome}</strong><br>
+                            <div>
 
-                            <small>Lote ${epi.lote}</small>
+                                <h3 class="font-semibold text-slate-800">
+                                    ${icone} ${epi.nome}
+                                </h3>
+
+                                <p class="text-sm text-slate-500">
+                                    Lote ${epi.lote}
+                                </p>
+
+                            </div>
+
+                            <i class="fa-solid fa-chevron-right text-slate-400"></i>
 
                         </div>
 
-                        <div>
+                        <div class="mt-4 grid grid-cols-2 gap-4">
 
-                            <strong>${epi.quantidade}</strong>
+                            <div>
+
+                                <p class="text-xs uppercase text-slate-400">
+                                    Validade
+                                </p>
+
+                                <p class="font-medium">
+
+                                    ${
+                                        epi.vencimento
+                                        ? new Date(epi.vencimento).toLocaleDateString("pt-BR")
+                                        : "-"
+                                    }
+
+                                </p>
+
+                            </div>
+
+                            <div>
+
+                                <p class="text-xs uppercase text-slate-400">
+                                    Estoque
+                                </p>
+
+                                <p class="font-bold text-lg">
+                                    ${epi.quantidade}
+                                </p>
+
+                            </div>
 
                         </div>
 
                     </div>
 
-                `;
+                    `;
 
             }).join("");
 

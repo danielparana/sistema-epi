@@ -5,85 +5,149 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Funcionários - EPI Fácil</title>
 
-    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <!-- Fontes e Ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- TailwindCSS via CDN (Para desenvolvimento) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            500: '#0d54b4',
+                            600: '#0056c6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-    <header>
-        <div class="header-left">
-            <span class="logo-text">EPI Fácil</span>
-            <span class="system-title">Sistema de Controle de EPIs</span>
+<body class="bg-slate-50 text-slate-900 min-h-screen font-sans antialiased">
+
+    <!-- Cabeçalho (Padronizado) -->
+    <header class="bg-white h-auto md:h-16 px-6 py-4 md:py-0 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-200 gap-4 md:gap-0">
+        <div class="flex items-center gap-4">
+            <span class="text-brand-500 font-semibold text-xl">EPI Fácil</span>
+            <span class="text-slate-800 font-medium text-lg hidden sm:block">Sistema de Controle de EPIs</span>
         </div>
-        <div class="header-right">
-            <i class="fa-regular fa-circle-question header-icon" title="Ajuda"></i>
-            <div class="dropdown-wrapper">
-                <i class="fa-solid fa-gear header-icon" id="settingsBtn" title="Configurações"></i>
-                <div class="dropdown-menu" id="settingsDropdown">
-                    <a href="#"><i class="fa-solid fa-sliders"></i> Preferências</a>
-                    <a href="#"><i class="fa-solid fa-lock"></i> Segurança</a>
-                    <a href="#"><i class="fa-solid fa-database"></i> Backup de Dados</a>
+        
+        <div class="flex items-center justify-between w-full md:w-auto gap-6">
+            <button aria-label="Ajuda" class="text-brand-500 text-xl hover:text-brand-600 transition-colors">
+                <i class="fa-regular fa-circle-question"></i>
+            </button>
+            
+            <div class="relative group">
+                <button aria-label="Configurações" aria-haspopup="true" id="settingsBtn" class="text-brand-500 text-xl hover:text-brand-600 transition-colors">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+                <div id="settingsDropdown" class="hidden absolute top-8 left-1/2 -translate-x-1/2 bg-white min-w-[200px] shadow-lg border border-slate-200 rounded-md z-50 py-2">
+                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-500"><i class="fa-solid fa-sliders"></i> Preferências</a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-500"><i class="fa-solid fa-lock"></i> Segurança</a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-500"><i class="fa-solid fa-database"></i> Backup de Dados</a>
                 </div>
             </div>
-            <div class="dropdown-wrapper">
-                <div class="user-avatar" id="profileBtn" title="Perfil do Usuário"></div>
-                <div class="dropdown-menu dropdown-right" id="profileDropdown">
-                    <div class="user-info-header">
-                        <strong id="userName">João Silva</strong>
-                        <span id="userRole">Administrador</span>
+
+            <div class="relative group">
+                <button aria-label="Perfil do Usuário" aria-haspopup="true" id="profileBtn" class="w-10 h-10 rounded-full bg-brand-500 text-white font-semibold flex items-center justify-center hover:bg-brand-600 transition-colors">
+                    M
+                </button>
+                <div id="profileDropdown" class="hidden absolute top-12 right-0 bg-white min-w-[220px] shadow-lg border border-slate-200 rounded-md z-50 py-2">
+                    <div class="px-4 py-3 flex flex-col border-b border-slate-100">
+                        <strong id="userName" class="text-sm text-slate-900">Marcos</strong>
+                        <span id="userRole" class="text-xs text-slate-500">Administrador</span>
                     </div>
-                    <hr>
-                    <a href="#"><i class="fa-solid fa-user"></i> Meu Perfil</a>
-                    <a href="login.html" class="logout-link"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-500 mt-1"><i class="fa-solid fa-user"></i> Meu Perfil</a>
+                    <a href="login.html" class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
                 </div>
             </div>
         </div>
     </header>
 
-    <div class="sub-header">
-        <nav class="nav-container">
-            <a href="dashboard.html" class="nav-item">Dashboard</a>
-            <a href="funcionarios.html" class="nav-item active">Funcionários</a>
-            <a href="epis.html" class="nav-item">EPIs</a>
-            <a href="entregas.html" class="nav-item">Entregas</a>
-            <a href="relatorios.html" class="nav-item">Relatórios</a>
-        </nav>
-    </div>
+    <!-- O menu de navegação dinâmica será injetador automaticamente aqui pelo seu common.js -->
 
-    <main class="main-container">
-        <section class="panel-section">
-            <h2 class="section-title">Cadastro de Funcionário</h2>
-            <form id="employeeForm" class="form-grid" style="margin-top: 20px;">
-                <input type="text" id="nome" class="input" placeholder="Nome" required>
-                <input type="text" id="cpf" class="input" placeholder="CPF (formato: 000.000.000-00)" required>
-                <input type="text" id="cargo" class="input" placeholder="Cargo" required>
-                <div class="form-actions form-full-width">
-                    <button type="submit" class="btn btn-primary" style="width:100%;">Cadastrar Funcionário</button>
+    <!-- Área Principal (Modificado: pb-24 impede a sobreposição da Bottom Bar no Mobile) -->
+    <main class="p-6 md:p-10 pb-24 md:pb-10 max-w-7xl mx-auto space-y-8">
+        
+        <!-- Painel: Cadastro de Funcionário -->
+        <section class="bg-white rounded-xl p-6 md:p-8 border border-slate-200 shadow-sm">
+            <h2 class="text-slate-900 text-xl font-medium pb-4 border-b border-slate-200 mb-6">
+                Cadastro de Funcionário
+            </h2>
+            
+            <form id="employeeForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- Nome (Ocupa a linha toda no mobile, 2/3 no tablet/desktop) -->
+                <div class="md:col-span-2">
+                    <label for="nome" class="block text-sm font-medium text-slate-700 mb-2">Nome Completo</label>
+                    <input type="text" id="nome" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all shadow-sm" placeholder="Ex: Ana Souza" required>
                 </div>
-                <small id="cpfError" style="color: red; grid-column: span 2; display: none;"></small>
+
+                <!-- Cargo (1/3 no tablet/desktop) -->
+                <div class="w-full">
+                    <label for="cargo" class="block text-sm font-medium text-slate-700 mb-2">Cargo</label>
+                    <input type="text" id="cargo" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all shadow-sm" placeholder="Ex: Operador de Máquinas" required>
+                </div>
+
+                <!-- CPF -->
+                <div class="w-full">
+                    <label for="cpf" class="block text-sm font-medium text-slate-700 mb-2">CPF</label>
+                    <input type="text" id="cpf" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all shadow-sm" placeholder="000.000.000-00" required>
+                </div>
+
+                <!-- Contêiner de Erro e Ação (Alinhado à direita em telas grandes) -->
+                <div class="md:col-span-2 lg:col-span-2 flex flex-col sm:flex-row justify-between items-center gap-4 pt-2">
+                    
+                    <!-- Mensagem de erro dinâmica para o CPF -->
+                    <small id="cpfError" class="text-red-600 font-medium w-full sm:w-auto text-center sm:text-left hidden" aria-live="polite"></small>
+                    
+                    <button type="submit" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-medium py-3 px-6 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 ml-auto">
+                        <i class="fa-solid fa-user-plus"></i> Cadastrar Funcionário
+                    </button>
+                </div>
             </form>
         </section>
 
-        <section class="panel-section">
-            <h2 class="section-title">Funcionários Cadastrados</h2>
-            <div style="overflow-x:auto; margin-top:20px;">
-                <table style="width:100%; border-collapse: collapse;">
-                    <thead>
+        <!-- Painel: Tabela de Funcionários -->
+        <section class="bg-white rounded-xl p-6 md:p-8 border border-slate-200 shadow-sm">
+            <h2 class="text-slate-900 text-xl font-medium pb-4 border-b border-slate-200 mb-6">
+                Funcionários Cadastrados
+            </h2>
+            
+            <!-- Wrapper para proteção de conteúdo -->
+            <div class="w-full overflow-x-auto rounded-lg md:border md:border-slate-200 md:shadow-sm">
+                <table class="w-full text-left border-collapse md:min-w-[700px] whitespace-nowrap">
+                    <!-- Modificado: hidden md:table-header-group elimina o cabeçalho de tabela no mobile -->
+                    <thead class="hidden md:table-header-group bg-slate-800 text-white">
                         <tr>
-                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">ID</th>
-                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">Nome</th>
-                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">CPF</th>
-                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:left;">Cargo</th>
-                            <th style="padding: 14px; border-bottom: 1px solid #e1e5eb; text-align:center;">Ações</th>
+                            <th class="p-4 text-sm font-semibold tracking-wide">ID</th>
+                            <th class="p-4 text-sm font-semibold tracking-wide">Nome</th>
+                            <th class="p-4 text-sm font-semibold tracking-wide">CPF</th>
+                            <th class="p-4 text-sm font-semibold tracking-wide">Cargo</th>
+                            <th class="p-4 text-sm font-semibold tracking-wide text-center">Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="employeeTable"></tbody>
+                    <tbody id="employeeTable" class="md:divide-y md:divide-slate-200 bg-transparent md:bg-white">
+                        <!-- O JS injetará as linhas (<tr>) ou Cards aqui -->
+                        <tr>
+                            <td colspan="5" class="p-6 text-center text-sm text-slate-500 italic border-b-0">
+                                Carregando funcionários...
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </section>
     </main>
 
+    <!-- Scripts -->
     <script src="assets/js/api.js"></script>
     <script src="assets/js/common.js"></script>
     <script src="assets/js/funcionarios.js"></script>

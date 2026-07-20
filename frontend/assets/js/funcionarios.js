@@ -1,61 +1,51 @@
+// ==========================================
+// ESTADOS GLOBAIS DA TELA
+// ==========================================
 const employeeForm = document.getElementById("employeeForm");
 const employeeTable = document.getElementById("employeeTable");
 const cpfInput = document.getElementById("cpf");
-const cpfError = document.getElementById("cpfError")
+const cpfError = document.getElementById("cpfError");
 
-
+let allEmployees = []; // Memória local para evitar DOM scraping
+let displayedCount = 5; // Quantidade inicial na tela
 let editingEmployeeId = null;
 
-// CPF
+// ==========================================
+// MÁSCARA E VALIDAÇÃO DE CPF
+// ==========================================
+cpfInput.addEventListener('input', (e) => {
+    let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
+    if (value.length > 11) value = value.slice(0, 11);
+    
+    // Aplica a formatação: 000.000.000-00
+    if (value.length > 9) {
+        value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d{2}).*/, '$1.$2.$3-$4');
+    } else if (value.length > 6) {
+        value = value.replace(/^(\d{3})(\d{3})(\d{1,3}).*/, '$1.$2.$3');
+    } else if (value.length > 3) {
+        value = value.replace(/^(\d{3})(\d{1,3}).*/, '$1.$2');
+    }
+    e.target.value = value;
+});
 
 function validarCPF(cpf) {
-
     cpf = cpf.replace(/[^\d]+/g, '');
-
     if (cpf.length !== 11) return false;
-
-    if (
-        cpf === "00000000000" ||
-        cpf === "11111111111" ||
-        cpf === "22222222222" ||
-        cpf === "33333333333" ||
-        cpf === "44444444444" ||
-        cpf === "55555555555" ||
-        cpf === "66666666666" ||
-        cpf === "77777777777" ||
-        cpf === "88888888888" ||
-        cpf === "99999999999"
-    ) {
-        return false;
-    }
+    
+    // Verifica CPFs sequenciais inválidos
+    if (/^(\d)\1{10}$/.test(cpf)) return false;
 
     let soma = 0;
-
-    for (let i = 0; i < 9; i++) {
-        soma += parseInt(cpf.charAt(i)) * (10 - i);
-    }
-
+    for (let i = 0; i < 9; i++) soma += parseInt(cpf.charAt(i)) * (10 - i);
     let resto = 11 - (soma % 11);
-
     if (resto >= 10) resto = 0;
-
-    if (resto !== parseInt(cpf.charAt(9))) {
-        return false;
-    }
+    if (resto !== parseInt(cpf.charAt(9))) return false;
 
     soma = 0;
-
-    for (let i = 0; i < 10; i++) {
-        soma += parseInt(cpf.charAt(i)) * (11 - i);
-    }
-
+    for (let i = 0; i < 10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
     resto = 11 - (soma % 11);
-
     if (resto >= 10) resto = 0;
-
-    if (resto !== parseInt(cpf.charAt(10))) {
-        return false;
-    }
+    if (resto !== parseInt(cpf.charAt(10))) return false;
 
     return true;
 }
@@ -64,137 +54,176 @@ cpfInput.addEventListener('blur', () => {
     const cpf = cpfInput.value.trim();
     if (cpf && !validarCPF(cpf)) {
         cpfError.textContent = 'CPF inválido';
-        cpfError.style.display = 'block';
+        cpfError.classList.remove('hidden');
     } else {
-        cpfError.style.display = 'none';
+        cpfError.classList.add('hidden');
     }
 });
 
-// Carregar funcionarios
+// ==========================================
+// RENDERIZAÇÃO INTELIGENTE (Table -> Cards)
+// ==========================================
+function renderEmployees() {
+    employeeTable.innerHTML = '';
+    
+    // Filtra apenas a quantidade que deve aparecer na tela
+    const toShow = allEmployees.slice(0, displayedCount);
 
-async function carregarFuncionarios() {
-    const token = localStorage.getItem('token')
-
-    if (!token) {
-        window.location.href = 'login.html'
-        return
+    if (toShow.length === 0) {
+        employeeTable.innerHTML = `
+            <tr>
+                <td colspan="5" class="p-6 text-center text-sm text-slate-500 italic border-b-0">
+                    Nenhum funcionário cadastrado no sistema.
+                </td>
+            </tr>`;
+        return;
     }
+
+    // Define as classes responsivas do Tailwind para as células
+    const trClass = "flex flex-col md:table-row bg-white border border-slate-200 md:border-0 md:border-b md:border-slate-200 rounded-xl md:rounded-none shadow-sm md:shadow-none mb-4 md:mb-0 hover:bg-slate-50 transition-colors overflow-hidden";
+    const tdClass = "p-4 md:py-3 md:px-4 text-sm text-slate-700 flex justify-between md:table-cell items-center border-b border-slate-100 md:border-0 last:border-0";
+    const labelClass = "md:hidden font-semibold text-slate-900"; // Rótulos apenas no celular
+
+    toShow.forEach(funcionario => {
+        employeeTable.innerHTML += `
+            <tr class="${trClass}">
+                <td class="${tdClass}">
+                    <span class="${labelClass}">ID</span>
+                    <span class="font-medium text-slate-500 md:text-slate-700">#${funcionario.id}</span>
+                </td>
+                <td class="${tdClass}">
+                    <span class="${labelClass}">Nome</span>
+                    <strong class="text-slate-900 md:font-normal">${funcionario.nome}</strong>
+                </td>
+                <td class="${tdClass}">
+                    <span class="${labelClass}">CPF</span>
+                    <span>${funcionario.cpf}</span>
+                </td>
+                <td class="${tdClass}">
+                    <span class="${labelClass}">Cargo</span>
+                    <span class="bg-slate-100 text-slate-700 py-1 px-3 rounded-full text-xs font-medium border border-slate-200">${funcionario.cargo}</span>
+                </td>
+                <td class="${tdClass} md:text-center bg-slate-50 md:bg-transparent">
+                    <span class="${labelClass}">Ações</span>
+                    <div class="flex gap-2">
+                        <button class="btn-edit flex items-center justify-center w-9 h-9 text-brand-600 bg-brand-50 hover:bg-brand-100 hover:text-brand-700 rounded-lg transition-colors border border-brand-100" onclick="editarFuncionario(${funcionario.id})" title="Editar">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button class="btn-delete flex items-center justify-center w-9 h-9 text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700 rounded-lg transition-colors border border-red-100" onclick="desativarFuncionario(${funcionario.id})" title="Desativar">
+                            <i class="fa-solid fa-user-slash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+
+    // Injeta o botão "Carregar Mais" se houver funcionários ocultos
+    if (allEmployees.length > displayedCount) {
+        employeeTable.innerHTML += `
+            <tr class="block md:table-row border-none">
+                <td colspan="5" class="p-4 text-center border-none">
+                    <button type="button" onclick="carregarMais()" class="w-full md:w-auto bg-white border-2 border-slate-200 hover:border-brand-500 text-slate-700 hover:text-brand-600 font-medium py-3 px-8 rounded-xl transition-all shadow-sm">
+                        Ver mais funcionários (${allEmployees.length - displayedCount} restantes)
+                    </button>
+                </td>
+            </tr>
+        `;
+    }
+
+    aplicarPermissoes();
+}
+
+// Aumenta o limite de exibição e re-renderiza
+window.carregarMais = function() {
+    displayedCount += 5;
+    renderEmployees();
+};
+
+// ==========================================
+// COMUNICAÇÃO COM A API (CRUD)
+// ==========================================
+async function carregarFuncionarios() {
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = 'login.html'; return; }
 
     try {
         const response = await fetch(`${API_URL}/employees`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
+            headers: { Authorization: `Bearer ${token}` }
+        });
 
         if (!response.ok) {
-            localStorage.removeItem('token')
-            window.location.href = 'login.html'
-            return
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+            return;
         }
 
-        const funcionarios = await response.json()
+        allEmployees = await response.json();
+        
+        // Formata os CPFs vindos do banco para exibição visual padrão
+        allEmployees = allEmployees.map(emp => {
+            const rawCpf = emp.cpf.replace(/\D/g, '');
+            const formattedCpf = rawCpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2}).*/, '$1.$2.$3-$4');
+            return { ...emp, cpf: formattedCpf };
+        });
 
-        employeeTable.innerHTML = ''
-
-        funcionarios.forEach(funcionario => {
-            employeeTable.innerHTML += `
-                <tr>
-                <td style="padding:10px;">${funcionario.id}</td>
-
-                <td style="padding:10px;">
-                    ${funcionario.nome}
-                </td>
-
-                <td style="padding:10px;">
-                    ${funcionario.cpf}
-                </td>
-
-                <td style="padding:10px;">
-                    ${funcionario.cargo}
-                </td>
-
-                <td style="padding:10px; text-align:center;">
-
-                    <button
-                        class="btn-edit"
-                        onclick="editarFuncionario(${funcionario.id})">
-
-                        <i class="fa-solid fa-pen"></i>
-
-                    </button>
-
-                    <button
-                        class="btn-delete"
-                        onclick="desativarFuncionario(${funcionario.id})">
-
-                        <i class="fa-solid fa-user-slash"></i>
-
-                    </button>
-
-                </td>
-
-            </tr>
-            `
-        })
-
-        aplicarPermissoes()
+        renderEmployees();
 
     } catch (error) {
-        console.error(error)
+        console.error(error);
+        employeeTable.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">Erro de conexão com o servidor.</td></tr>`;
     }
-
-
 }
 
-// Editar funcionarios
+// ==========================================
+// AÇÕES DO USUÁRIO
+// ==========================================
+window.editarFuncionario = function(id) {
+    const funcionario = allEmployees.find(f => f.id === id);
+    if (!funcionario) return;
 
-function editarFuncionario(id) {
+    document.getElementById("nome").value = funcionario.nome;
+    document.getElementById("cpf").value = funcionario.cpf;
+    document.getElementById("cargo").value = funcionario.cargo;
+    editingEmployeeId = id;
 
-    const funcionario = [...employeeTable.rows]
-        .find(row => Number(row.cells[0].textContent) === id)
-
-    if (!funcionario) return
-
-    document.getElementById("nome").value = funcionario.cells[1].textContent.trim()
-    document.getElementById("cpf").value = funcionario.cells[2].textContent.trim()
-    document.getElementById("cargo").value = funcionario.cells[3].textContent.trim()
-
-    editingEmployeeId = id
-
-    employeeForm.querySelector("button").textContent = "Salvar Alterações"
-}
-
-// Salvar funcionario
+    const btn = employeeForm.querySelector("button");
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> Salvar Alterações';
+    btn.classList.replace('bg-brand-600', 'bg-green-600');
+    btn.classList.replace('hover:bg-brand-700', 'hover:bg-green-700');
+    
+    // UX: Rola a tela suavemente para o formulário no mobile
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
 
 employeeForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const nome = document.getElementById("nome").value;
-    const cpf = document.getElementById("cpf").value;
+    const cpfRaw = document.getElementById("cpf").value;
     const cargo = document.getElementById("cargo").value;
 
-    if (!validarCPF(cpf)) {
+    if (!validarCPF(cpfRaw)) {
         cpfError.textContent = 'CPF inválido';
-        cpfError.style.display = 'block';
+        cpfError.classList.remove('hidden');
         return;
     }
 
+    // ENVIO SEGURO: Apenas números para a API
+    const cpfClean = cpfRaw.replace(/\D/g, '');
+
     try {
-        const token = localStorage.getItem('token')
+        const token = localStorage.getItem('token');
+        if (!token) { window.location.href = 'login.html'; return; }
 
-        if (!token) {
-            window.location.href = 'login.html'
-            return
-        }
+        const url = editingEmployeeId ? `${API_URL}/employees/${editingEmployeeId}` : `${API_URL}/employees`;
+        const method = editingEmployeeId ? 'PUT' : 'POST';
 
-        const url = editingEmployeeId
-            ? `${API_URL}/employees/${editingEmployeeId}`
-            : `${API_URL}/employees`
-
-        const method = editingEmployeeId
-            ? 'PUT'
-            : 'POST'
+        // Feedback visual de carregamento no botão
+        const submitBtn = employeeForm.querySelector("button");
+        const originalBtnHTML = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
+        submitBtn.disabled = true;
 
         const response = await fetch(url, {
             method,
@@ -202,36 +231,34 @@ employeeForm.addEventListener("submit", async (e) => {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`
             },
-            body: JSON.stringify({
-                nome,
-                cpf,
-                cargo
-            })
-        })
+            body: JSON.stringify({ nome, cpf: cpfClean, cargo })
+        });
+
+        submitBtn.disabled = false;
 
         if (!response.ok) {
-            const erro = await response.json()
-
+            submitBtn.innerHTML = originalBtnHTML;
+            const erro = await response.json();
             if (erro.error === "CPF já cadastrado") {
-                alert("Já existe um funcionário cadastrado com esse CPF.")
-                return
+                alert("Já existe um funcionário cadastrado com esse CPF.");
+                return;
             }
-            throw new Error(erro.error || "Erro ao cadastrar")
+            throw new Error(erro.error || "Erro ao cadastrar");
         }
 
+        // Reseta o estado do formulário
         employeeForm.reset();
-        cpfError.style.display = 'none';
+        cpfError.classList.add('hidden');
         editingEmployeeId = null;
-        employeeForm.querySelector("button").textContent =
-            "Cadastrar Funcionário";
+        submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Cadastrar Funcionário';
+        submitBtn.classList.replace('bg-green-600', 'bg-brand-600');
+        submitBtn.classList.replace('hover:bg-green-700', 'hover:bg-brand-700');
 
-        carregarFuncionarios();
+        // Volta a paginação para 5 para exibir o novo usuário no topo
+        displayedCount = 5; 
+        await carregarFuncionarios();
 
-        alert(
-            method === 'POST'
-                ? "Funcionário cadastrado com sucesso!"
-                : "Funcionário atualizado com sucesso!"
-        );
+        alert(method === 'POST' ? "Funcionário cadastrado com sucesso!" : "Funcionário atualizado com sucesso!");
 
     } catch (error) {
         console.error(error);
@@ -239,63 +266,48 @@ employeeForm.addEventListener("submit", async (e) => {
     }
 });
 
+window.desativarFuncionario = async function(id) {
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = 'login.html'; return; }
 
-// Desativar funcionario
-
-async function desativarFuncionario(id) {
-    const token = localStorage.getItem('token')
-
-    if (!token) {
-        window.location.href = 'login.html'
-        return
-    }
-
-    const confirmacao = confirm("Tem certeza que deseja desativar este funcionário?")
-    if (!confirmacao) return
+    if (!confirm("Tem certeza que deseja desativar este funcionário?")) return;
 
     try {
         const response = await fetch(`${API_URL}/employees/${id}`, {
             method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
+            headers: { Authorization: `Bearer ${token}` }
+        });
 
-        if (!response.ok) {
-            throw new Error("Erro ao desativar funcionário")
-        }
+        if (!response.ok) throw new Error("Erro ao desativar funcionário");
 
-        alert("Funcionário desativado com sucesso!")
-
-        carregarFuncionarios()
+        alert("Funcionário desativado com sucesso!");
+        carregarFuncionarios();
 
     } catch (error) {
-        console.error(error)
-        alert(error.message)
+        console.error(error);
+        alert(error.message);
     }
-}
+};
 
-//  Permissoes
-
+// ==========================================
+// CONTROLE DE ACESSO (PERMISSÕES)
+// ==========================================
 function aplicarPermissoes() {
+    const user = window.currentUser || JSON.parse(localStorage.getItem("user"));
+    if (!user) return;
 
-    const user = window.currentUser || JSON.parse(localStorage.getItem("user"))
-    
-    if (!user) return
+    const editBtns = document.querySelectorAll(".btn-edit");
+    const deleteBtns = document.querySelectorAll(".btn-delete");
 
-    const editBtns = document.querySelectorAll(".btn-edit")
-    const deleteBtns = document.querySelectorAll(".btn-delete")
-
-    // FUNCIONÁRIO não pode ver ações
     if (user.role === "FUNCIONARIO") {
-        editBtns.forEach(btn => btn.style.display = "none")
-        deleteBtns.forEach(btn => btn.style.display = "none")
+        editBtns.forEach(btn => btn.classList.add("hidden"));
+        deleteBtns.forEach(btn => btn.classList.add("hidden"));
     }
 
-    // GERENTE não pode deletar
     if (user.role === "GERENTE") {
-       deleteBtns.forEach(btn => btn.style.display = "none") 
+       deleteBtns.forEach(btn => btn.classList.add("hidden")); 
     }
 }
 
+// INICIALIZAÇÃO
 carregarFuncionarios();
