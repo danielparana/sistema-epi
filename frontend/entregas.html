@@ -129,10 +129,9 @@
             </h2>
             
             <!-- Wrapper com overflow para proteger tabelas no mobile -->
-            <div class="w-full overflow-x-auto rounded-lg md:border md:border-slate-200 md:shadow-sm">
-                <!-- Modificado: md:min-w-[800px] para liberar os cards no celular -->
-                <table class="w-full text-left border-collapse md:min-w-[800px] whitespace-nowrap">
-                    <!-- Modificado: hidden md:table-header-group -->
+            <div class="w-full overflow-x-hidden md:overflow-x-auto rounded-lg md:border md:border-slate-200 md:shadow-sm">
+                <!-- Adicionado 'block md:table' e 'md:whitespace-nowrap' -->
+                <table class="w-full text-left border-collapse md:min-w-[800px] md:whitespace-nowrap block md:table">
                     <thead class="hidden md:table-header-group bg-slate-800 text-white">
                         <tr>
                             <th class="p-4 text-sm font-semibold tracking-wide">ID</th>
@@ -143,10 +142,10 @@
                             <th class="p-4 text-sm font-semibold tracking-wide">Data/Hora</th>
                         </tr>
                     </thead>
-                    <tbody id="deliveryTable" class="md:divide-y md:divide-slate-200 bg-transparent md:bg-white">
-                        <!-- O JS injetará as linhas (<tr>) aqui -->
-                        <tr>
-                            <td colspan="6" class="p-6 text-center text-sm text-slate-500 italic border-b-0">
+                    <!-- Adicionado 'block md:table-row-group w-full' -->
+                    <tbody id="deliveryTable" class="block md:table-row-group md:divide-y md:divide-slate-200 bg-transparent md:bg-white w-full">
+                        <tr class="block md:table-row w-full">
+                            <td colspan="6" class="p-6 text-center text-sm text-slate-500 italic border-b-0 block md:table-cell w-full">
                                 Carregando histórico de entregas...
                             </td>
                         </tr>

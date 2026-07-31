@@ -61,7 +61,7 @@ cpfInput.addEventListener('blur', () => {
 });
 
 // ==========================================
-// RENDERIZAÇÃO INTELIGENTE (Table -> Cards)
+// RENDERIZAÇÃO INTELIGENTE E BLINDADA
 // ==========================================
 function renderEmployees() {
     employeeTable.innerHTML = '';
@@ -72,44 +72,50 @@ function renderEmployees() {
     if (toShow.length === 0) {
         employeeTable.innerHTML = `
             <tr>
-                <td colspan="5" class="p-6 text-center text-sm text-slate-500 italic border-b-0">
+                <td colspan="5" class="p-6 text-center text-sm text-slate-500 italic border-b-0 block md:table-cell w-full">
                     Nenhum funcionário cadastrado no sistema.
                 </td>
             </tr>`;
         return;
     }
 
-    // Define as classes responsivas do Tailwind para as células
-    const trClass = "flex flex-col md:table-row bg-white border border-slate-200 md:border-0 md:border-b md:border-slate-200 rounded-xl md:rounded-none shadow-sm md:shadow-none mb-4 md:mb-0 hover:bg-slate-50 transition-colors overflow-hidden";
-    const tdClass = "p-4 md:py-3 md:px-4 text-sm text-slate-700 flex justify-between md:table-cell items-center border-b border-slate-100 md:border-0 last:border-0";
-    const labelClass = "md:hidden font-semibold text-slate-900"; // Rótulos apenas no celular
+    // Classes responsivas e protegidas contra overflow
+    const trClass = "flex flex-col md:table-row bg-white border border-slate-200 md:border-0 md:border-b md:border-slate-200 rounded-xl md:rounded-none shadow-sm md:shadow-none mb-4 md:mb-0 hover:bg-slate-50 transition-colors overflow-hidden w-full";
+    const tdClass = "p-4 md:py-3 md:px-4 text-sm text-slate-700 flex justify-between md:table-cell items-center border-b border-slate-100 md:border-0 last:border-0 w-full min-w-0";
+    const labelClass = "md:hidden font-semibold text-slate-900 shrink-0 mr-4";
 
     toShow.forEach(funcionario => {
+        // Sanitização (Fail-Safe) contra dados corrompidos do backend
+        const idSafe = funcionario.id || "N/A";
+        const nomeSafe = funcionario.nome || "Nome Indisponível";
+        const cpfSafe = funcionario.cpf || "Não informado";
+        const cargoSafe = funcionario.cargo || "Não atribuído";
+
         employeeTable.innerHTML += `
             <tr class="${trClass}">
                 <td class="${tdClass}">
                     <span class="${labelClass}">ID</span>
-                    <span class="font-medium text-slate-500 md:text-slate-700">#${funcionario.id}</span>
+                    <span class="font-medium text-slate-500 md:text-slate-700 truncate">#${idSafe}</span>
                 </td>
                 <td class="${tdClass}">
                     <span class="${labelClass}">Nome</span>
-                    <strong class="text-slate-900 md:font-normal">${funcionario.nome}</strong>
+                    <strong class="text-slate-900 md:font-normal text-right truncate ml-auto pl-4 max-w-[70%] md:max-w-none" title="${nomeSafe}">${nomeSafe}</strong>
                 </td>
                 <td class="${tdClass}">
                     <span class="${labelClass}">CPF</span>
-                    <span>${funcionario.cpf}</span>
+                    <span class="text-right truncate">${cpfSafe}</span>
                 </td>
                 <td class="${tdClass}">
                     <span class="${labelClass}">Cargo</span>
-                    <span class="bg-slate-100 text-slate-700 py-1 px-3 rounded-full text-xs font-medium border border-slate-200">${funcionario.cargo}</span>
+                    <span class="bg-slate-100 text-slate-700 py-1 px-3 rounded-full text-xs font-medium border border-slate-200 truncate max-w-[60%] md:max-w-none text-right" title="${cargoSafe}">${cargoSafe}</span>
                 </td>
                 <td class="${tdClass} md:text-center bg-slate-50 md:bg-transparent">
                     <span class="${labelClass}">Ações</span>
-                    <div class="flex gap-2">
-                        <button class="btn-edit flex items-center justify-center w-9 h-9 text-brand-600 bg-brand-50 hover:bg-brand-100 hover:text-brand-700 rounded-lg transition-colors border border-brand-100" onclick="editarFuncionario(${funcionario.id})" title="Editar">
+                    <div class="flex gap-2 ml-auto">
+                        <button class="btn-edit flex items-center justify-center w-9 h-9 text-brand-600 bg-brand-50 hover:bg-brand-100 hover:text-brand-700 rounded-lg transition-colors border border-brand-100" onclick="editarFuncionario(${idSafe})" title="Editar">
                             <i class="fa-solid fa-pen"></i>
                         </button>
-                        <button class="btn-delete flex items-center justify-center w-9 h-9 text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700 rounded-lg transition-colors border border-red-100" onclick="desativarFuncionario(${funcionario.id})" title="Desativar">
+                        <button class="btn-delete flex items-center justify-center w-9 h-9 text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700 rounded-lg transition-colors border border-red-100" onclick="desativarFuncionario(${idSafe})" title="Desativar">
                             <i class="fa-solid fa-user-slash"></i>
                         </button>
                     </div>
@@ -121,8 +127,8 @@ function renderEmployees() {
     // Injeta o botão "Carregar Mais" se houver funcionários ocultos
     if (allEmployees.length > displayedCount) {
         employeeTable.innerHTML += `
-            <tr class="block md:table-row border-none">
-                <td colspan="5" class="p-4 text-center border-none">
+            <tr class="block md:table-row border-none w-full">
+                <td colspan="5" class="p-4 text-center border-none block md:table-cell w-full">
                     <button type="button" onclick="carregarMais()" class="w-full md:w-auto bg-white border-2 border-slate-200 hover:border-brand-500 text-slate-700 hover:text-brand-600 font-medium py-3 px-8 rounded-xl transition-all shadow-sm">
                         Ver mais funcionários (${allEmployees.length - displayedCount} restantes)
                     </button>
@@ -160,9 +166,10 @@ async function carregarFuncionarios() {
 
         allEmployees = await response.json();
         
-        // Formata os CPFs vindos do banco para exibição visual padrão
+        // Formata os CPFs vindos do banco para exibição visual padrão (com validação de existência)
         allEmployees = allEmployees.map(emp => {
-            const rawCpf = emp.cpf.replace(/\D/g, '');
+            if (!emp.cpf) return emp; // Ignora se não houver CPF
+            const rawCpf = String(emp.cpf).replace(/\D/g, '');
             const formattedCpf = rawCpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2}).*/, '$1.$2.$3-$4');
             return { ...emp, cpf: formattedCpf };
         });
@@ -171,7 +178,7 @@ async function carregarFuncionarios() {
 
     } catch (error) {
         console.error(error);
-        employeeTable.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">Erro de conexão com o servidor.</td></tr>`;
+        employeeTable.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500 font-medium block md:table-cell w-full">Erro de conexão com o servidor.</td></tr>`;
     }
 }
 
@@ -179,12 +186,13 @@ async function carregarFuncionarios() {
 // AÇÕES DO USUÁRIO
 // ==========================================
 window.editarFuncionario = function(id) {
-    const funcionario = allEmployees.find(f => f.id === id);
+    if (!id || id === "N/A") return;
+    const funcionario = allEmployees.find(f => f.id == id); // Usa == para garantir match de tipo
     if (!funcionario) return;
 
-    document.getElementById("nome").value = funcionario.nome;
-    document.getElementById("cpf").value = funcionario.cpf;
-    document.getElementById("cargo").value = funcionario.cargo;
+    document.getElementById("nome").value = funcionario.nome || '';
+    document.getElementById("cpf").value = funcionario.cpf || '';
+    document.getElementById("cargo").value = funcionario.cargo || '';
     editingEmployeeId = id;
 
     const btn = employeeForm.querySelector("button");
@@ -267,6 +275,8 @@ employeeForm.addEventListener("submit", async (e) => {
 });
 
 window.desativarFuncionario = async function(id) {
+    if (!id || id === "N/A") return;
+    
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = 'login.html'; return; }
 

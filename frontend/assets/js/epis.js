@@ -34,57 +34,65 @@ function renderEpis() {
 
     if (toShow.length === 0) {
         epiTable.innerHTML = `
-            <tr>
-                <td colspan="9" class="p-6 text-center text-sm text-slate-500 italic border-b-0">
+            <tr class="block md:table-row w-full">
+                <td colspan="9" class="p-6 text-center text-sm text-slate-500 italic border-b-0 block md:table-cell w-full">
                     Nenhum EPI cadastrado no sistema.
                 </td>
             </tr>`;
         return;
     }
 
-    // Classes responsivas do Tailwind
-    const trClass = "flex flex-col md:table-row bg-white border border-slate-200 md:border-0 md:border-b md:border-slate-200 rounded-xl md:rounded-none shadow-sm md:shadow-none mb-4 md:mb-0 hover:bg-slate-50 transition-colors overflow-hidden";
-    const tdClass = "p-4 md:py-3 md:px-3 text-sm text-slate-700 flex justify-between md:table-cell items-center border-b border-slate-100 md:border-0 last:border-0";
-    const labelClass = "md:hidden font-semibold text-slate-900";
+    // Classes responsivas estabilizadas, seguindo o padrão da tela de funcionários
+    const trClass = "flex flex-col md:table-row bg-white border border-slate-200 md:border-0 md:border-b md:border-slate-200 rounded-xl md:rounded-none shadow-sm md:shadow-none mb-4 md:mb-0 hover:bg-slate-50 transition-colors overflow-hidden w-full";
+    const tdClass = "p-4 md:py-3 md:px-3 text-sm text-slate-700 flex justify-between md:table-cell items-center border-b border-slate-100 md:border-0 last:border-0 w-full min-w-0";
+    const labelClass = "md:hidden font-semibold text-slate-900 shrink-0 mr-4";
 
     toShow.forEach(epi => {
-        const dataCadastro = new Date(epi.dataCadastro || epi.createdAt);
-        const formattedDateTime = dataCadastro.toLocaleDateString('pt-BR'); // Simplificado para economizar espaço
-        const formattedVencimento = epi.vencimento ? new Date(epi.vencimento).toLocaleDateString('pt-BR') : '-';
-        const initialQtd = epi.initialQuantidade ?? epi.quantidade;
+        const dataCadastro = (epi.dataCadastro || epi.createdAt) ? new Date(epi.dataCadastro || epi.createdAt) : null;
+        const formattedDateTime = dataCadastro ? dataCadastro.toLocaleDateString('pt-BR') : '-';
+        const formattedVencimento = epi.vencimento && epi.vencimento !== "N/A" ? new Date(epi.vencimento).toLocaleDateString('pt-BR') : '-';
+        const initialQtd = epi.initialQuantidade ?? epi.quantidade ?? 0;
 
         epiTable.innerHTML += `
             <tr class="${trClass}">
                 <td class="${tdClass} hidden md:table-cell"><span class="font-medium text-slate-500">#${epi.id}</span></td>
+                
                 <td class="${tdClass}">
                     <span class="${labelClass}">Nome</span>
-                    <strong class="text-slate-900 md:font-normal">${epi.nome}</strong>
+                    <strong class="text-slate-900 md:font-normal text-right truncate ml-auto max-w-[70%] md:max-w-none" title="${epi.nome}">${epi.nome}</strong>
                 </td>
+                
                 <td class="${tdClass}">
                     <span class="${labelClass}">Lote</span>
-                    <span>${epi.lote}</span>
+                    <span class="text-right truncate ml-auto max-w-[60%] md:max-w-none" title="${epi.lote}">${epi.lote}</span>
                 </td>
+                
                 <td class="${tdClass}">
                     <span class="${labelClass}">Descrição</span>
-                    <span class="truncate max-w-[120px] md:max-w-[150px]" title="${epi.descricao || ''}">${epi.descricao || '-'}</span>
+                    <span class="truncate text-right ml-auto max-w-[50%] md:max-w-[150px]" title="${epi.descricao}">${epi.descricao}</span>
                 </td>
+                
                 <td class="${tdClass}">
                     <span class="${labelClass}">Vencimento</span>
-                    <span class="${epi.vencimento && new Date(epi.vencimento) < new Date() ? 'text-red-600 font-medium' : ''}">${formattedVencimento}</span>
+                    <span class="text-right ml-auto ${epi.vencimento && new Date(epi.vencimento) < new Date() ? 'text-red-600 font-medium' : ''}">${formattedVencimento}</span>
                 </td>
+                
                 <td class="${tdClass} hidden md:table-cell">
                     <span>${initialQtd}</span>
                 </td>
+                
                 <td class="${tdClass}">
                     <span class="${labelClass}">Qtd. Atual</span>
-                    <span class="font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded-md border border-brand-100">${epi.quantidade}</span>
+                    <span class="font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded-md border border-brand-100 ml-auto">${epi.quantidade}</span>
                 </td>
+                
                 <td class="${tdClass} hidden md:table-cell">
                     <span>${formattedDateTime}</span>
                 </td>
+                
                 <td class="${tdClass} md:text-center bg-slate-50 md:bg-transparent">
                     <span class="${labelClass}">Ações</span>
-                    <div class="flex gap-2 justify-end">
+                    <div class="flex gap-2 justify-end ml-auto">
                         <button type="button" class="flex items-center justify-center w-9 h-9 text-slate-600 bg-slate-100 hover:bg-slate-200 hover:text-slate-800 rounded-lg transition-colors border border-slate-200" onclick="abrirHistorico(${epi.id})" title="Histórico">
                             <i class="fas fa-history"></i>
                         </button>
@@ -100,11 +108,11 @@ function renderEpis() {
         `;
     });
 
-    // Injeta botão de paginação se houver dados ocultos
+    // Injeta botão de paginação com suporte total a blocos no mobile
     if (episExistentes.length > displayedCount) {
         epiTable.innerHTML += `
-            <tr class="block md:table-row border-none">
-                <td colspan="9" class="p-4 text-center border-none">
+            <tr class="block md:table-row border-none w-full">
+                <td colspan="9" class="p-4 text-center border-none block md:table-cell w-full">
                     <button type="button" onclick="carregarMaisEpis()" class="w-full md:w-auto bg-white border-2 border-slate-200 hover:border-brand-500 text-slate-700 hover:text-brand-600 font-medium py-3 px-8 rounded-xl transition-all shadow-sm">
                         Ver mais EPIs (${episExistentes.length - displayedCount} restantes)
                     </button>
@@ -113,7 +121,6 @@ function renderEpis() {
         `;
     }
 
-    // Caso o common.js aplique permissões aos novos botões gerados
     if (typeof aplicarPermissoesGlobais === 'function') aplicarPermissoesGlobais();
 }
 
@@ -143,14 +150,25 @@ async function carregarEpis() {
             throw new Error('Falha ao carregar os EPIs');
         }
 
-        episExistentes = await response.json();
+        const data = await response.json();
+        
+        // Blindagem contra payloads inconsistentes da API
+        episExistentes = data.map(ep => ({
+            ...ep,
+            id: ep.id || "N/A",
+            nome: ep.nome || "Nome não informado",
+            lote: ep.lote || "Não definido",
+            descricao: ep.descricao || "Sem descrição",
+            vencimento: ep.vencimento || "N/A",
+            quantidade: ep.quantidade !== undefined ? ep.quantidade : 0
+        }));
         
         renderEpis();
         populateEpiNames(episExistentes);
 
     } catch (error) {
         console.error(error);
-        if (epiTable) epiTable.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-red-500">Erro de conexão com o servidor.</td></tr>`;
+        if (epiTable) epiTable.innerHTML = `<tr class="w-full block md:table-row"><td colspan="9" class="p-4 text-center text-red-500 w-full block md:table-cell">Erro de conexão com o servidor.</td></tr>`;
     }
 }
 
@@ -174,11 +192,22 @@ window.editarEpi = function(id) {
     if (!epi) return;
 
     editingEpiId = epi.id;
-    nomeEpiInput.value = epi.nome;
-    loteEpiInput.value = epi.lote;
-    descricaoEpiInput.value = epi.descricao || '';
+    // Resgata os valores e limpa os fallbacks para não sujar o input do usuário
+    nomeEpiInput.value = epi.nome === "Nome não informado" ? "" : epi.nome;
+    loteEpiInput.value = epi.lote === "Não definido" ? "" : epi.lote;
+    descricaoEpiInput.value = epi.descricao === "Sem descrição" ? "" : epi.descricao;
     quantidadeEpiInput.value = epi.quantidade;
-    vencimentoEpiInput.value = epi.vencimento ? new Date(epi.vencimento).toISOString().slice(0,10) : '';
+    
+    // Tratamento seguro para formatação de data ISO para input type="date"
+    if (epi.vencimento && epi.vencimento !== "N/A") {
+        try {
+            vencimentoEpiInput.value = new Date(epi.vencimento).toISOString().slice(0,10);
+        } catch(e) {
+            vencimentoEpiInput.value = '';
+        }
+    } else {
+        vencimentoEpiInput.value = '';
+    }
     
     cancelEditBtn.style.display = 'inline-flex';
     saveEpiBtn.innerHTML = '<i class="fa-solid fa-check"></i> Atualizar EPI';
@@ -228,7 +257,6 @@ window.abrirHistorico = function(id) {
     historyModalSubtitle.textContent = `EPI: ${epi.nome} — Lote: ${epi.lote}`;
     historyModalContent.innerHTML = '<div class="flex justify-center p-8"><i class="fa-solid fa-spinner fa-spin text-3xl text-brand-500"></i></div>';
     
-    // Removido 'hidden' e adicionado 'flex' se o Tailwind controlar o layout do modal
     historyModalOverlay.classList.remove('hidden');
     historyModalOverlay.classList.add('flex');
 
@@ -342,7 +370,6 @@ if (epiForm) {
             const method = editingEpiId ? 'PUT' : 'POST';
             const url = editingEpiId ? `${API_URL}/epis/${editingEpiId}` : `${API_URL}/epis`;
 
-            // Feedback visual no botão
             const originalBtnHTML = saveEpiBtn.innerHTML;
             saveEpiBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
             saveEpiBtn.disabled = true;
@@ -366,7 +393,7 @@ if (epiForm) {
 
             const wasEditing = Boolean(editingEpiId);
             resetForm();
-            displayedCount = 5; // Volta para o topo da paginação
+            displayedCount = 5; 
             await carregarEpis();
             alert(wasEditing ? 'EPI atualizado com sucesso!' : 'EPI cadastrado com sucesso!');
 

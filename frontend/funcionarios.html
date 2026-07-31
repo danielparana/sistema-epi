@@ -122,28 +122,29 @@
             </h2>
             
             <!-- Wrapper para proteção de conteúdo -->
-            <div class="w-full overflow-x-auto rounded-lg md:border md:border-slate-200 md:shadow-sm">
-                <table class="w-full text-left border-collapse md:min-w-[700px] whitespace-nowrap">
-                    <!-- Modificado: hidden md:table-header-group elimina o cabeçalho de tabela no mobile -->
-                    <thead class="hidden md:table-header-group bg-slate-800 text-white">
-                        <tr>
-                            <th class="p-4 text-sm font-semibold tracking-wide">ID</th>
-                            <th class="p-4 text-sm font-semibold tracking-wide">Nome</th>
-                            <th class="p-4 text-sm font-semibold tracking-wide">CPF</th>
-                            <th class="p-4 text-sm font-semibold tracking-wide">Cargo</th>
-                            <th class="p-4 text-sm font-semibold tracking-wide text-center">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="employeeTable" class="md:divide-y md:divide-slate-200 bg-transparent md:bg-white">
-                        <!-- O JS injetará as linhas (<tr>) ou Cards aqui -->
-                        <tr>
-                            <td colspan="5" class="p-6 text-center text-sm text-slate-500 italic border-b-0">
-                                Carregando funcionários...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <!-- Wrapper para proteção de conteúdo -->
+<div class="w-full overflow-x-hidden md:overflow-x-auto rounded-lg md:border md:border-slate-200 md:shadow-sm">
+    <!-- Adicionado 'block md:table' e 'md:whitespace-nowrap' -->
+    <table class="w-full text-left border-collapse md:min-w-[700px] md:whitespace-nowrap block md:table">
+        <thead class="hidden md:table-header-group bg-slate-800 text-white">
+            <tr>
+                <th class="p-4 text-sm font-semibold tracking-wide">ID</th>
+                <th class="p-4 text-sm font-semibold tracking-wide">Nome</th>
+                <th class="p-4 text-sm font-semibold tracking-wide">CPF</th>
+                <th class="p-4 text-sm font-semibold tracking-wide">Cargo</th>
+                <th class="p-4 text-sm font-semibold tracking-wide text-center">Ações</th>
+            </tr>
+        </thead>
+        <!-- Adicionado 'block md:table-row-group' -->
+        <tbody id="employeeTable" class="block md:table-row-group md:divide-y md:divide-slate-200 bg-transparent md:bg-white w-full">
+            <tr>
+                <td colspan="5" class="p-6 text-center text-sm text-slate-500 italic border-b-0 block md:table-cell w-full">
+                    Carregando funcionários...
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
         </section>
     </main>
 
