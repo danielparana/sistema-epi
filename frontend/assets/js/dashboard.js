@@ -202,8 +202,9 @@ function abrirDetalhesAlerta(id) {
             <ul>
                 ${alerta.funcionarios.map(f => `
                     <li>
-                        <strong>${f.nome}</strong><br>
-                        Entregue em ${new Date(f.dataEntrega).toLocaleDateString("pt-BR")}
+                         <strong>Funcionário:</strong> ${f.nome}<br>
+                        <strong>Matrícula:</strong> ${f.id}<br>
+                        <strong>Entrega:</strong> ${new Date(f.dataEntrega).toLocaleDateString("pt-BR")}
                     </li>
                 `).join("")}
             </ul>
