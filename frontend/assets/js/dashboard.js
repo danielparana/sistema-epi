@@ -201,7 +201,7 @@ function abrirDetalhesAlerta(id) {
         funcionarios = `
             <ul class="space-y-3">
                 ${alerta.funcionarios.map(f => `
-                    <li class="border-b pb-3">
+                    <li class="border-b-2 border-gray-200 pb-3">
                          <strong>Funcionário:</strong> ${f.nome}<br>
                         <strong>Matrícula:</strong> ${f.id}<br>
                         <strong>Entrega:</strong> ${new Date(f.dataEntrega).toLocaleDateString("pt-BR")}
