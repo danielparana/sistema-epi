@@ -26,6 +26,10 @@ model Employee {
   cargo      String
   createdAt  DateTime   @default(now())
   active     Boolean    @default(true)
+
+  sectorId   Int?
+  sector     Sector?    @relation(fields: [sectorId], references: [id])
+
   deliveries Delivery[]
   user       User?
 }
@@ -41,6 +45,7 @@ model Epi {
   createdAt         DateTime     @default(now())
   deliveries        Delivery[]
   epiHistories      EpiHistory[]
+  emailAlerts       EmailAlert[]
 }
 
 model EpiHistory {
@@ -64,4 +69,32 @@ model Delivery {
   dataEntrega DateTime @default(now())
   employee    Employee @relation(fields: [employeeId], references: [id])
   epi         Epi      @relation(fields: [epiId], references: [id])
+}
+
+model Sector {
+  id           Int          @id @default(autoincrement())
+  nome         String       @unique
+
+  employees    Employee[]
+  responsible  Responsible?
+}
+
+model Responsible {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  email     String   @unique
+
+  sectorId  Int      @unique
+  sector    Sector   @relation(fields: [sectorId], references: [id])
+}
+
+model EmailAlert {
+  id           Int      @id @default(autoincrement())
+  epiId        Int
+  diasAlerta   Int
+  enviadoEm    DateTime @default(now())
+
+  epi          Epi      @relation(fields: [epiId], references: [id])
+
+  @@unique([epiId, diasAlerta])
 }
