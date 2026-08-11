@@ -43,9 +43,9 @@ function renderEpis() {
     }
 
     // Classes responsivas estabilizadas, seguindo o padrão da tela de funcionários
-    const trClass = "flex flex-col md:table-row bg-white border border-slate-200 md:border-0 md:border-b md:border-slate-200 rounded-xl md:rounded-none shadow-sm md:shadow-none mb-4 md:mb-0 hover:bg-slate-50 transition-colors overflow-hidden w-full";
-    const tdClass = "p-4 md:py-3 md:px-3 text-sm text-slate-700 flex justify-between md:table-cell items-center border-b border-slate-100 md:border-0 last:border-0 w-full min-w-0";
-    const labelClass = "md:hidden font-semibold text-slate-900 shrink-0 mr-4";
+    const trClass = "flex flex-col lg:table-row bg-white border border-slate-200 lg:border-0 lg:border-b lg:border-slate-200 rounded-xl lg:rounded-none shadow-sm lg:shadow-none mb-4 lg:mb-0 hover:bg-slate-50 transition-colors overflow-hidden w-full";
+    const tdClass = "p-4 lg:py-3 lg:px-3 text-sm text-slate-700 flex justify-between lg:table-cell items-center border-b border-slate-100 lg:border-0 last:border-0 w-full min-w-0";
+    const labelClass = "lg:hidden font-semibold text-slate-900 shrink-0 mr-4";
 
     toShow.forEach(epi => {
         const dataCadastro = (epi.dataCadastro || epi.createdAt) ? new Date(epi.dataCadastro || epi.createdAt) : null;
@@ -54,72 +54,72 @@ function renderEpis() {
         const initialQtd = epi.initialQuantidade ?? epi.quantidade ?? 0;
 
         epiTable.innerHTML += `
-            <tr class="${trClass}">
-                <td class="${tdClass} hidden md:table-cell"><span class="font-medium text-slate-500">#${epi.id}</span></td>
-                
-                <td class="${tdClass}">
-                    <span class="${labelClass}">Nome</span>
-                    <strong class="text-slate-900 md:font-normal text-right truncate ml-auto max-w-[70%] md:max-w-none" title="${epi.nome}">${epi.nome}</strong>
-                </td>
-                
-                <td class="${tdClass}">
-                    <span class="${labelClass}">Lote</span>
-                    <span class="text-right truncate ml-auto max-w-[60%] md:max-w-none" title="${epi.lote}">${epi.lote}</span>
-                </td>
-                
-                <td class="${tdClass}">
-                    <span class="${labelClass}">Descrição</span>
-                    <span class="truncate text-right ml-auto max-w-[50%] md:max-w-[150px]" title="${epi.descricao}">${epi.descricao}</span>
-                </td>
-                
-                <td class="${tdClass}">
-                    <span class="${labelClass}">Vencimento</span>
-                    <span class="text-right ml-auto ${epi.vencimento && new Date(epi.vencimento) < new Date() ? 'text-red-600 font-medium' : ''}">${formattedVencimento}</span>
-                </td>
-                
-                <td class="${tdClass} hidden md:table-cell">
-                    <span>${initialQtd}</span>
-                </td>
-                
-                <td class="${tdClass}">
-                    <span class="${labelClass}">Qtd. Atual</span>
-                    <span class="font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded-md border border-brand-100 ml-auto">${epi.quantidade}</span>
-                </td>
-                
-                <td class="${tdClass} hidden md:table-cell">
-                    <span>${formattedDateTime}</span>
-                </td>
-                
-                <td class="${tdClass} md:text-center bg-slate-50 md:bg-transparent">
-                    <span class="${labelClass}">Ações</span>
-                    <div class="flex gap-2 justify-end ml-auto">
-                        <button type="button" class="flex items-center justify-center w-9 h-9 text-slate-600 bg-slate-100 hover:bg-slate-200 hover:text-slate-800 rounded-lg transition-colors border border-slate-200" onclick="abrirHistorico(${epi.id})" title="Histórico">
-                            <i class="fas fa-history"></i>
-                        </button>
-                        <button type="button" class="flex items-center justify-center w-9 h-9 text-brand-600 bg-brand-50 hover:bg-brand-100 hover:text-brand-700 rounded-lg transition-colors border border-brand-100" onclick="editarEpi(${epi.id})" title="Editar">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button type="button" class="flex items-center justify-center w-9 h-9 text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700 rounded-lg transition-colors border border-red-100" onclick="deletarEpi(${epi.id})" title="Excluir">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
+    <tr class="${trClass}">
+        <td class="${tdClass} hidden lg:table-cell"><span class="font-medium text-slate-500">#${epi.id}</span></td>
+        
+        <td class="${tdClass}">
+            <span class="${labelClass}">Nome</span>
+            <strong class="text-slate-900 lg:font-normal text-right truncate ml-auto max-w-[70%] lg:max-w-none" title="${epi.nome}">${epi.nome}</strong>
+        </td>
+        
+        <td class="${tdClass}">
+            <span class="${labelClass}">Lote</span>
+            <span class="text-right truncate ml-auto max-w-[60%] lg:max-w-none" title="${epi.lote}">${epi.lote}</span>
+        </td>
+        
+        <td class="${tdClass}">
+            <span class="${labelClass}">Descrição</span>
+            <span class="truncate text-right ml-auto max-w-[50%] lg:max-w-[150px]" title="${epi.descricao}">${epi.descricao}</span>
+        </td>
+        
+        <td class="${tdClass}">
+            <span class="${labelClass}">Vencimento</span>
+            <span class="text-right ml-auto ${epi.vencimento && new Date(epi.vencimento) < new Date() ? 'text-red-600 font-medium' : ''}">${formattedVencimento}</span>
+        </td>
+        
+        <td class="${tdClass} hidden lg:table-cell">
+            <span>${initialQtd}</span>
+        </td>
+        
+        <td class="${tdClass}">
+            <span class="${labelClass}">Qtd. Atual</span>
+            <span class="font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded-md border border-brand-100 ml-auto">${epi.quantidade}</span>
+        </td>
+        
+        <td class="${tdClass} hidden lg:table-cell">
+            <span>${formattedDateTime}</span>
+        </td>
+        
+        <td class="${tdClass} lg:text-center bg-slate-50 lg:bg-transparent">
+            <span class="${labelClass}">Ações</span>
+            <div class="flex gap-2 justify-end ml-auto">
+                <button type="button" class="flex items-center justify-center w-9 h-9 text-slate-600 bg-slate-100 hover:bg-slate-200 hover:text-slate-800 rounded-lg transition-colors border border-slate-200" onclick="abrirHistorico(${epi.id})" title="Histórico">
+                    <i class="fas fa-history"></i>
+                </button>
+                <button type="button" class="flex items-center justify-center w-9 h-9 text-brand-600 bg-brand-50 hover:bg-brand-100 hover:text-brand-700 rounded-lg transition-colors border border-brand-100" onclick="editarEpi(${epi.id})" title="Editar">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" class="flex items-center justify-center w-9 h-9 text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700 rounded-lg transition-colors border border-red-100" onclick="deletarEpi(${epi.id})" title="Excluir">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </td>
+    </tr>
+`;
     });
 
     // Injeta botão de paginação com suporte total a blocos no mobile
     if (episExistentes.length > displayedCount) {
-        epiTable.innerHTML += `
-            <tr class="block md:table-row border-none w-full">
-                <td colspan="9" class="p-4 text-center border-none block md:table-cell w-full">
-                    <button type="button" onclick="carregarMaisEpis()" class="w-full md:w-auto bg-white border-2 border-slate-200 hover:border-brand-500 text-slate-700 hover:text-brand-600 font-medium py-3 px-8 rounded-xl transition-all shadow-sm">
-                        Ver mais EPIs (${episExistentes.length - displayedCount} restantes)
-                    </button>
-                </td>
-            </tr>
-        `;
-    }
+    epiTable.innerHTML += `
+        <tr class="block lg:table-row border-none w-full">
+            <td colspan="9" class="p-4 text-center border-none block lg:table-cell w-full">
+                <button type="button" onclick="carregarMaisEpis()" class="w-full lg:w-auto bg-white border-2 border-slate-200 hover:border-brand-500 text-slate-700 hover:text-brand-600 font-medium py-3 px-8 rounded-xl transition-all shadow-sm">
+                    Ver mais EPIs (${episExistentes.length - displayedCount} restantes)
+                </button>
+            </td>
+        </tr>
+    `;
+}
 
     if (typeof aplicarPermissoesGlobais === 'function') aplicarPermissoesGlobais();
 }

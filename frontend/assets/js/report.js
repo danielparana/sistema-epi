@@ -107,11 +107,11 @@ function renderizarTabela(reports) {
         return
     }
 
-    // Estrutura Base (Contêiner Blindado)
+    // Estrutura Base (Contêiner Blindado ajustado para lg)
     let html = `
-        <div class="w-full overflow-x-hidden md:overflow-x-auto rounded-lg md:border md:border-slate-200 md:shadow-sm">
-            <table class="w-full text-left border-collapse md:min-w-[800px] md:whitespace-nowrap block md:table">
-                <thead class="hidden md:table-header-group bg-slate-800 text-white">
+        <div class="w-full overflow-x-hidden lg:overflow-x-auto rounded-lg lg:border lg:border-slate-200 lg:shadow-sm">
+            <table class="w-full text-left border-collapse lg:min-w-[800px] lg:whitespace-nowrap block lg:table">
+                <thead class="hidden lg:table-header-group bg-slate-800 text-white">
                     <tr>
                         <th class="p-4 text-sm font-semibold tracking-wide">Data</th>
                         <th class="p-4 text-sm font-semibold tracking-wide">Funcionário</th>
@@ -120,13 +120,13 @@ function renderizarTabela(reports) {
                         <th class="p-4 text-sm font-semibold tracking-wide text-center">Quantidade</th>
                     </tr>
                 </thead>
-                <tbody class="block md:table-row-group md:divide-y md:divide-slate-200 bg-transparent md:bg-white w-full">
+                <tbody class="block lg:table-row-group lg:divide-y lg:divide-slate-200 bg-transparent lg:bg-white w-full">
     `;
 
-    // Classes Responsivas
-    const trClass = "flex flex-col md:table-row bg-white border border-slate-200 md:border-0 md:border-b md:border-slate-200 rounded-xl md:rounded-none shadow-sm md:shadow-none mb-4 md:mb-0 hover:bg-slate-50 transition-colors overflow-hidden w-full";
-    const tdClass = "p-4 md:py-3 md:px-4 text-sm text-slate-700 flex justify-between md:table-cell items-center border-b border-slate-100 md:border-0 last:border-0 w-full min-w-0";
-    const labelClass = "md:hidden font-semibold text-slate-900 shrink-0 mr-4";
+    // Classes Responsivas ajustadas para lg
+    const trClass = "flex flex-col lg:table-row bg-white border border-slate-200 lg:border-0 lg:border-b lg:border-slate-200 rounded-xl lg:rounded-none shadow-sm lg:shadow-none mb-4 lg:mb-0 hover:bg-slate-50 transition-colors overflow-hidden w-full";
+    const tdClass = "p-4 lg:py-3 lg:px-4 text-sm text-slate-700 flex justify-between lg:table-cell items-center border-b border-slate-100 lg:border-0 last:border-0 w-full min-w-0";
+    const labelClass = "lg:hidden font-semibold text-slate-900 shrink-0 mr-4";
 
     reports.forEach(report => {
         // Fallbacks de segurança
@@ -141,23 +141,23 @@ function renderizarTabela(reports) {
             <tr class="${trClass}">
                 <td class="${tdClass}">
                     <span class="${labelClass}">Data</span>
-                    <span class="text-slate-900 font-medium md:font-normal">${dataFormatada}</span>
+                    <span class="text-slate-900 font-medium lg:font-normal">${dataFormatada}</span>
                 </td>
                 <td class="${tdClass}">
                     <span class="${labelClass}">Funcionário</span>
-                    <strong class="text-slate-900 md:font-normal text-right truncate ml-auto max-w-[65%] md:max-w-none" title="${funcNome}">${funcNome}</strong>
+                    <strong class="text-slate-900 lg:font-normal text-right truncate ml-auto max-w-[65%] lg:max-w-none" title="${funcNome}">${funcNome}</strong>
                 </td>
                 <td class="${tdClass}">
                     <span class="${labelClass}">EPI</span>
-                    <span class="text-right truncate ml-auto max-w-[65%] md:max-w-none" title="${epiNome}">${epiNome}</span>
+                    <span class="text-right truncate ml-auto max-w-[65%] lg:max-w-none" title="${epiNome}">${epiNome}</span>
                 </td>
                 <td class="${tdClass}">
                     <span class="${labelClass}">Lote</span>
-                    <span class="bg-slate-100 text-slate-700 py-1 px-3 rounded-md text-xs font-medium border border-slate-200 ml-auto truncate max-w-[50%] md:max-w-none">${lote}</span>
+                    <span class="bg-slate-100 text-slate-700 py-1 px-3 rounded-md text-xs font-medium border border-slate-200 ml-auto truncate max-w-[50%] lg:max-w-none">${lote}</span>
                 </td>
-                <td class="${tdClass} md:text-center">
+                <td class="${tdClass} lg:text-center">
                     <span class="${labelClass}">Quantidade</span>
-                    <span class="font-bold text-brand-600 bg-brand-50 px-3 py-1 rounded-md border border-brand-100 ml-auto md:mx-auto">${qtd}</span>
+                    <span class="font-bold text-brand-600 bg-brand-50 px-3 py-1 rounded-md border border-brand-100 ml-auto lg:mx-auto">${qtd}</span>
                 </td>
             </tr>
         `;

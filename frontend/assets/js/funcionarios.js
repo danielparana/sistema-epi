@@ -72,17 +72,17 @@ function renderEmployees() {
     if (toShow.length === 0) {
         employeeTable.innerHTML = `
             <tr>
-                <td colspan="5" class="p-6 text-center text-sm text-slate-500 italic border-b-0 block md:table-cell w-full">
+                <td colspan="5" class="p-6 text-center text-sm text-slate-500 italic border-b-0 block lg:table-cell w-full">
                     Nenhum funcionário cadastrado no sistema.
                 </td>
             </tr>`;
         return;
     }
 
-    // Classes responsivas e protegidas contra overflow
-    const trClass = "flex flex-col md:table-row bg-white border border-slate-200 md:border-0 md:border-b md:border-slate-200 rounded-xl md:rounded-none shadow-sm md:shadow-none mb-4 md:mb-0 hover:bg-slate-50 transition-colors overflow-hidden w-full";
-    const tdClass = "p-4 md:py-3 md:px-4 text-sm text-slate-700 flex justify-between md:table-cell items-center border-b border-slate-100 md:border-0 last:border-0 w-full min-w-0";
-    const labelClass = "md:hidden font-semibold text-slate-900 shrink-0 mr-4";
+    // Classes responsivas ajustadas para lg (Tablets exibirão cards)
+    const trClass = "flex flex-col lg:table-row bg-white border border-slate-200 lg:border-0 lg:border-b lg:border-slate-200 rounded-xl lg:rounded-none shadow-sm lg:shadow-none mb-4 lg:mb-0 hover:bg-slate-50 transition-colors overflow-hidden w-full";
+    const tdClass = "p-4 lg:py-3 lg:px-4 text-sm text-slate-700 flex justify-between lg:table-cell items-center border-b border-slate-100 lg:border-0 last:border-0 w-full min-w-0";
+    const labelClass = "lg:hidden font-semibold text-slate-900 shrink-0 mr-4";
 
     toShow.forEach(funcionario => {
         // Sanitização (Fail-Safe) contra dados corrompidos do backend
@@ -95,11 +95,11 @@ function renderEmployees() {
             <tr class="${trClass}">
                 <td class="${tdClass}">
                     <span class="${labelClass}">ID</span>
-                    <span class="font-medium text-slate-500 md:text-slate-700 truncate">#${idSafe}</span>
+                    <span class="font-medium text-slate-500 lg:text-slate-700 truncate">#${idSafe}</span>
                 </td>
                 <td class="${tdClass}">
                     <span class="${labelClass}">Nome</span>
-                    <strong class="text-slate-900 md:font-normal text-right truncate ml-auto pl-4 max-w-[70%] md:max-w-none" title="${nomeSafe}">${nomeSafe}</strong>
+                    <strong class="text-slate-900 lg:font-normal text-right truncate ml-auto pl-4 max-w-[70%] lg:max-w-none" title="${nomeSafe}">${nomeSafe}</strong>
                 </td>
                 <td class="${tdClass}">
                     <span class="${labelClass}">CPF</span>
@@ -107,11 +107,11 @@ function renderEmployees() {
                 </td>
                 <td class="${tdClass}">
                     <span class="${labelClass}">Cargo</span>
-                    <span class="bg-slate-100 text-slate-700 py-1 px-3 rounded-full text-xs font-medium border border-slate-200 truncate max-w-[60%] md:max-w-none text-right" title="${cargoSafe}">${cargoSafe}</span>
+                    <span class="bg-slate-100 text-slate-700 py-1 px-3 rounded-full text-xs font-medium border border-slate-200 truncate max-w-[60%] lg:max-w-none text-right" title="${cargoSafe}">${cargoSafe}</span>
                 </td>
-                <td class="${tdClass} md:text-center bg-slate-50 md:bg-transparent">
+                <td class="${tdClass} lg:text-center bg-slate-50 lg:bg-transparent">
                     <span class="${labelClass}">Ações</span>
-                    <div class="flex gap-2 ml-auto">
+                    <div class="flex gap-2 ml-auto lg:mx-auto lg:justify-center">
                         <button class="btn-edit flex items-center justify-center w-9 h-9 text-brand-600 bg-brand-50 hover:bg-brand-100 hover:text-brand-700 rounded-lg transition-colors border border-brand-100" onclick="editarFuncionario(${idSafe})" title="Editar">
                             <i class="fa-solid fa-pen"></i>
                         </button>
@@ -127,9 +127,9 @@ function renderEmployees() {
     // Injeta o botão "Carregar Mais" se houver funcionários ocultos
     if (allEmployees.length > displayedCount) {
         employeeTable.innerHTML += `
-            <tr class="block md:table-row border-none w-full">
-                <td colspan="5" class="p-4 text-center border-none block md:table-cell w-full">
-                    <button type="button" onclick="carregarMais()" class="w-full md:w-auto bg-white border-2 border-slate-200 hover:border-brand-500 text-slate-700 hover:text-brand-600 font-medium py-3 px-8 rounded-xl transition-all shadow-sm">
+            <tr class="block lg:table-row border-none w-full">
+                <td colspan="5" class="p-4 text-center border-none block lg:table-cell w-full">
+                    <button type="button" onclick="carregarMais()" class="w-full lg:w-auto bg-white border-2 border-slate-200 hover:border-brand-500 text-slate-700 hover:text-brand-600 font-medium py-3 px-8 rounded-xl transition-all shadow-sm">
                         Ver mais funcionários (${allEmployees.length - displayedCount} restantes)
                     </button>
                 </td>
@@ -139,7 +139,6 @@ function renderEmployees() {
 
     aplicarPermissoes();
 }
-
 // Aumenta o limite de exibição e re-renderiza
 window.carregarMais = function() {
     displayedCount += 5;

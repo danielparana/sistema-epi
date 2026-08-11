@@ -40,9 +40,7 @@
         </div>
         
         <div class="flex items-center justify-between w-full md:w-auto gap-6">
-            <button aria-label="Ajuda" class="text-brand-500 text-xl hover:text-brand-600 transition-colors">
-                <i class="fa-regular fa-circle-question"></i>
-            </button>
+           
             
             <div class="relative group">
                 <button aria-label="Configurações" aria-haspopup="true" id="settingsBtn" class="text-brand-500 text-xl hover:text-brand-600 transition-colors">
@@ -134,33 +132,31 @@
                 EPIs em Estoque
             </h2>
             
-            <!-- Wrapper para proteção de conteúdo (Ajustado para mobile) -->
-            <div class="w-full overflow-x-hidden md:overflow-x-auto rounded-lg md:border md:border-slate-200 md:shadow-sm">
-                <!-- Adicionado 'block md:table' e 'md:whitespace-nowrap' -->
-                <table class="w-full text-left border-collapse md:min-w-[1200px] md:whitespace-nowrap block md:table">
-                    <thead class="hidden md:table-header-group bg-slate-800 text-white">
-                        <tr>
-                            <th class="p-4 text-sm font-semibold tracking-wide">ID</th>
-                            <th class="p-4 text-sm font-semibold tracking-wide">Nome</th>
-                            <th class="p-4 text-sm font-semibold tracking-wide">Lote</th>
-                            <th class="p-4 text-sm font-semibold tracking-wide">Descrição</th>
-                            <th class="p-4 text-sm font-semibold tracking-wide">Vencimento</th>
-                            <th class="p-4 text-sm font-semibold tracking-wide">Qtd Inicial</th>
-                            <th class="p-4 text-sm font-semibold tracking-wide text-center">Qtd Atual</th>
-                            <th class="p-4 text-sm font-semibold tracking-wide">Data/Hora</th>
-                            <th class="p-4 text-sm font-semibold tracking-wide text-right">Ações</th>
-                        </tr>
-                    </thead>
-                    <!-- Adicionado 'block md:table-row-group w-full' -->
-                    <tbody id="epiTable" class="block md:table-row-group md:divide-y md:divide-slate-200 bg-transparent md:bg-white w-full">
-                        <tr class="block md:table-row w-full">
-                            <td colspan="9" class="p-6 text-center text-sm text-slate-500 italic border-b-0 block md:table-cell w-full">
-                                Carregando estoque...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <!-- Wrapper para proteção de conteúdo (Ajustado para lg) -->
+<div class="w-full overflow-x-hidden lg:overflow-x-auto rounded-lg lg:border lg:border-slate-200 lg:shadow-sm">
+    <table class="w-full text-left border-collapse lg:min-w-[1200px] lg:whitespace-nowrap block lg:table">
+        <thead class="hidden lg:table-header-group bg-slate-800 text-white">
+            <tr>
+                <th class="p-4 text-sm font-semibold tracking-wide">ID</th>
+                <th class="p-4 text-sm font-semibold tracking-wide">Nome</th>
+                <th class="p-4 text-sm font-semibold tracking-wide">Lote</th>
+                <th class="p-4 text-sm font-semibold tracking-wide">Descrição</th>
+                <th class="p-4 text-sm font-semibold tracking-wide">Vencimento</th>
+                <th class="p-4 text-sm font-semibold tracking-wide">Qtd Inicial</th>
+                <th class="p-4 text-sm font-semibold tracking-wide text-center">Qtd Atual</th>
+                <th class="p-4 text-sm font-semibold tracking-wide">Data/Hora</th>
+                <th class="p-4 text-sm font-semibold tracking-wide text-right">Ações</th>
+            </tr>
+        </thead>
+        <tbody id="epiTable" class="block lg:table-row-group lg:divide-y lg:divide-slate-200 bg-transparent lg:bg-white w-full">
+            <tr class="block lg:table-row w-full">
+                <td colspan="9" class="p-6 text-center text-sm text-slate-500 italic border-b-0 block lg:table-cell w-full">
+                    Carregando estoque...
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
         </section>
     </main>
 

@@ -123,7 +123,7 @@ function setupDropdowns() {
     const profileDropdown = document.getElementById('profileDropdown');
     const settingsBtn = document.getElementById('settingsBtn');
     const settingsDropdown = document.getElementById('settingsDropdown');
-    const logoutLink = document.getElementById('logoutBtn');
+    const logoutLink = document.querySelector('.logout-link');
 
     if (profileBtn && profileDropdown) {
         profileBtn.addEventListener('click', (e) => {
@@ -159,6 +159,55 @@ function setupDropdowns() {
 }
 
 // ==========================================
+// 5. OTIMIZAÇÃO DE CONVERSÃO E SUPORTE (UX/UI)
+// ==========================================
+function injectUXImprovements() {
+    // Evita injetar na tela de login/index
+    if (window.location.pathname.includes('login.html') || window.location.pathname.includes('index.html')) return;
+
+    // 1. INJEÇÃO DO BOTÃO DE VENDAS (HEADER)
+    const headerActions = document.querySelector('header .flex.items-center.justify-between');
+    
+    if (headerActions && !document.getElementById('btnUpgrade')) {
+        const upgradeBtnHTML = `
+            <!-- Versão Desktop: Botão Persuasivo -->
+            <a href="https://forms.gle/L5P39g6hALqYKnFp9" id="btnUpgrade" class="hidden sm:flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-5 py-2.5 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 border border-green-400/30 mr-2 md:mr-4">
+                <i class="fa-solid fa-crown text-yellow-300"></i>
+                <span>Fazer Upgrade</span>
+            </a>
+            
+            <!-- Versão Mobile: Ícone de Destaque com Animação -->
+            <a href="https://forms.gle/L5P39g6hALqYKnFp9" class="flex sm:hidden items-center justify-center w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full shadow-md mr-1 animate-[pulse_2s_ease-in-out_infinite] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                <i class="fa-solid fa-crown text-yellow-300"></i>
+            </a>
+        `;
+        
+        headerActions.insertAdjacentHTML('afterbegin', upgradeBtnHTML);
+    }
+
+    // 2. INJEÇÃO DO BOTÃO DE SUPORTE (FLOATING ACTION BUTTON)
+    if (!document.getElementById('supportFab')) {
+        const supportFabHTML = `
+            <button id="supportFab" onclick="abrirFormularioDuvidas()" class="fixed right-4 bottom-[90px] md:right-8 md:bottom-8 z-50 w-14 h-14 bg-brand-600 hover:bg-brand-700 text-white rounded-full shadow-[0_8px_30px_rgb(13,84,180,0.3)] flex items-center justify-center text-2xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-brand-500/30 group">
+                <i class="fa-regular fa-comment-dots transition-opacity duration-300 group-hover:opacity-0 absolute"></i>
+                <i class="fa-solid fa-headset transition-opacity duration-300 opacity-0 group-hover:opacity-100 absolute"></i>
+                
+                <span class="absolute right-16 bg-slate-800 text-white text-sm font-medium px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap hidden md:block shadow-lg">
+                    Dúvidas ou Sugestões?
+                    <svg class="absolute text-slate-800 h-2 w-full left-0 top-1/2 -translate-y-1/2 -right-[5px] translate-x-full" x="0px" y="0px" viewBox="0 0 255 255" xml:space="preserve"><polygon class="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
+                </span>
+            </button>
+        `;
+        document.body.insertAdjacentHTML('beforeend', supportFabHTML);
+    }
+}
+
+// Função placeholder para o modal de dúvidas
+window.abrirFormularioDuvidas = function() {
+    window.open('https://forms.gle/zE6dLz45uq7Wp8TJ8', '_blank');
+};
+
+// ==========================================
 // BOOTSTRAP DO SISTEMA
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -168,4 +217,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeHeader(); 
     // 3º: Libera interações de clique
     setupDropdowns();   
-});
+    // 4º: Injeta as melhorias de UX/UI focadas em conversão e retenção
+    injectUXImprovements();
+}); 
