@@ -9,18 +9,16 @@ router.get("/verificar", async (req, res) => {
 
     try {
 
+        console.log("Chave recebida da URL:", req.query.key ? "sim" : "não");
+        console.log("ALERTA_SECRET configurado:", process.env.ALERTA_SECRET ? "sim" : "não");
+
         const chave = req.query.key;
 
         if (chave !== process.env.ALERTA_SECRET) {
             return res.status(401).json({
-                error: "Não autorizado",
-
-                 debug: {
-                    chaveRecebidaDaURL: chave,
-                    variavelDoRenderExiste: process.env.ALERTA_SECRET ?
-                    "Sim, existe no servidor" : "Não, está undefined/vazia"
-                 }
-                    });
+                error: "Não autorizado"
+                
+            });
         }
 
         await verificarEPIsProximosDoVencimento();
