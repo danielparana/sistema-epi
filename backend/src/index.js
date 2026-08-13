@@ -16,6 +16,7 @@ const epiRoutes = require('./routes/epiRoutes')
 const deliveryRoutes = require('./routes/deliveryRoutes')
 const reportRoutes = require('./routes/reportRoutes')
 const dashboardRoutes = require('./routes/dashboardRoutes')
+const alertaRoutes = require('./routes/alertaRoutes')
 
 const app = express()
 
@@ -39,6 +40,7 @@ app.use('/epis', epiRoutes)
 app.use('/deliveries', deliveryRoutes)
 app.use('/reports', reportRoutes)
 app.use('/dashboard', dashboardRoutes)
+app.use('/alertas', alertaRoutes)
 
 app.use((err, req, res, next) => {
   console.error(err)
