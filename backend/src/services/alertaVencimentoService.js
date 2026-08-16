@@ -144,6 +144,8 @@ async function verificarEPIsProximosDoVencimento() {
             const responsavel =
                 setor?.responsible;
 
+            console.log("🔎 RESPONSÁVEL ENCONTRADO:", responsavel);
+
 
             if (!responsavel) {
 
