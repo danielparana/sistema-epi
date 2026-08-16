@@ -51,11 +51,14 @@ async function enviarEmailAlertaVencimento({
     destinatario,    funcionario,    matricula,
     setor,    epi,    lote,    vencimento,    diasParaVencer}) {
 
+        
+    console.log(`📨 Enviando e-mail para: ${destinatario}`);    
+
     const info = await transporter.sendMail({
 
         from: `"Sistema EPI" <${process.env.EMAIL_USER}>`,
 
-        to: process.env.EMAIL_USER,
+        to: destinatario,
 
         subject: `⚠️ Alerta de vencimento - ${epi}`,
 
