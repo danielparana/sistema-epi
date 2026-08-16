@@ -10,8 +10,41 @@ let dashboardData = null;
 
 let chaveAtualPopup = null;
 
+
 // ==========================
-// CARREGA DADOS DO DASHBOARD
+// FORMATAÇÃO DE DATAS
+// ==========================
+
+function formatDateISOtoBR(isoString) {
+
+    if (!isoString) return "-";
+
+    const [ano, mes, dia] =
+        isoString.split("T")[0].split("-");
+
+    return `${dia}/${mes}/${ano}`;
+}
+
+
+function daysDiffUTC(dateStr1, dateStr2) {
+
+    const d1 = new Date(
+        dateStr1.split("T")[0] + "T00:00:00.000Z"
+    );
+
+    const d2 = new Date(
+        dateStr2.split("T")[0] + "T00:00:00.000Z"
+    );
+
+    return Math.round(
+        (d2 - d1) /
+        (1000 * 60 * 60 * 24)
+    );
+}
+
+
+// ==========================
+// MODAL
 // ==========================
 
 function abrirModal(titulo, conteudo) {
@@ -23,8 +56,8 @@ function abrirModal(titulo, conteudo) {
     document
         .getElementById("modalOverlay")
         .classList.remove("hidden");
-
 }
+
 
 function fecharModal() {
 
@@ -33,15 +66,24 @@ function fecharModal() {
         .classList.add("hidden");
 
     if (chaveAtualPopup) {
-        localStorage.setItem(chaveAtualPopup, "visualizado");
-        
+
+        localStorage.setItem(
+            chaveAtualPopup,
+            "visualizado"
+        );
+
     }
 
 }
 
+
+// ==========================
+// LEMBRETES / POPUP
+// ==========================
+
 function verificarLembrete(data) {
 
-    // sem alertas ele não aparece
+    // Sem alertas, não mostra popup
     if (data.alertas.length === 0) {
         return;
     }
@@ -53,109 +95,175 @@ function verificarLembrete(data) {
 
     let periodo = null;
 
-    // das 8h às 11:39h
-    if (hora >= 8 && hora < 11 || (hora === 11 && minuto < 40)) {
+    // Das 8h às 11:39
+    if (
+        hora >= 8 &&
+        hora < 11 ||
+        (hora === 11 && minuto < 40)
+    ) {
+
         periodo = "08";
-    }
-    // das 11:40h às 16:59h
-    else if (hora === 11 && minuto >= 40 || (hora > 11 && hora < 17)) {
-        periodo = "1140";   
+
     }
 
-    // das 17h às 19:59h
-    else if (hora >= 17 ) {
-        periodo = "1700";       
+    // Das 11:40 às 16:59
+    else if (
+        (hora === 11 && minuto >= 40) ||
+        (hora > 11 && hora < 17)
+    ) {
+
+        periodo = "1140";
+
     }
 
-    
+    // Das 17h em diante
+    else if (hora >= 17) {
+
+        periodo = "1700";
+
+    }
+
     if (!periodo) {
         return;
     }
 
-   
-   const ano = agora.getFullYear();
-   const mes = String(agora.getMonth() + 1).padStart(2, '0');
-   const dia = String(agora.getDate()).padStart(2, '0');
-   const dataAtual = `${ano}-${mes}-${dia}`;
+    const ano = agora.getFullYear();
 
-   const chave = `popup_${dataAtual}_${periodo}`;
+    const mes = String(
+        agora.getMonth() + 1
+    ).padStart(2, "0");
+
+    const dia = String(
+        agora.getDate()
+    ).padStart(2, "0");
+
+    const dataAtual =
+        `${ano}-${mes}-${dia}`;
+
+    const chave =
+        `popup_${dataAtual}_${periodo}`;
 
     console.log("Chave:", chave);
 
-    const popupExibido = localStorage.getItem(chave);
+    const popupExibido =
+        localStorage.getItem(chave);
 
     if (popupExibido) {
-        console.log("Aviso já exibido período.");
+
+        console.log(
+            "Aviso já exibido período."
+        );
+
         return;
-    }   
+    }
 
+    const vencidos =
+        data.alertas.filter(
+            a => a.status === "vermelho"
+        );
 
-    const vencidos = data.alertas.filter(a => a.status === "vermelho");
-    const proximos = data.alertas.filter(a => a.status === "laranja");
-    const preventivos = data.alertas.filter(a => a.status === "amarelo");
+    const proximos =
+        data.alertas.filter(
+            a => a.status === "laranja"
+        );
 
-    const principais = data.alertas.slice(0, 3);
+    const preventivos =
+        data.alertas.filter(
+            a => a.status === "amarelo"
+        );
 
-    const listaPrincipais = principais.map(alerta => {
+    const principais =
+        data.alertas.slice(0, 3);
 
-        let icone = "🟢";
+    const listaPrincipais =
+        principais.map(alerta => {
 
-        if (alerta.status === "vermelho") icone = "🔴";
+            let icone = "🟢";
 
-        if (alerta.status === "laranja") icone = "🟠";
+            if (alerta.status === "vermelho")
+                icone = "🔴";
 
-        if (alerta.status === "amarelo") icone = "🟡";
+            if (alerta.status === "laranja")
+                icone = "🟠";
 
-        return `
-            <p>
-                ${icone}
-                <strong>${alerta.nome}</strong><br>
-                Lote: ${alerta.lote}
-            </p>
-        `;
+            if (alerta.status === "amarelo")
+                icone = "🟡";
 
-    }).join("");
+            return `
+                <p>
+                    ${icone}
+                    <strong>${alerta.nome}</strong><br>
+                    Lote: ${alerta.lote}
+                </p>
+            `;
 
-    console.log("Exibindo aviso de alerta.");
+        }).join("");
+
+    console.log(
+        "Exibindo aviso de alerta."
+    );
 
     chaveAtualPopup = chave;
 
     abrirModal(
-         "⚠️ Atenção aos EPIs",
 
-            `
-            <p>
-                Existem equipamentos que necessitam de acompanhamento.
-            </p>
+        "⚠️ Atenção aos EPIs",
 
-            <hr>
+        `
+        <p>
+            Existem equipamentos que necessitam
+            de acompanhamento.
+        </p>
 
-            <p>🔴 <strong>Vencidos:</strong> ${vencidos.length}</p>
+        <hr>
 
-            <p>🟠 <strong>Até 30 dias:</strong> ${proximos.length}</p>
+        <p>
+            🔴 <strong>Vencidos:</strong>
+            ${vencidos.length}
+        </p>
 
-            <p>🟡 <strong>Até 45 dias:</strong> ${preventivos.length}</p>
+        <p>
+            🟠 <strong>Até 30 dias:</strong>
+            ${proximos.length}
+        </p>
 
-            <hr>
+        <p>
+            🟡 <strong>Até 45 dias:</strong>
+            ${preventivos.length}
+        </p>
 
-            <h3>Principais alertas</h3>
+        <hr>
 
-            ${listaPrincipais}
+        <h3>Principais alertas</h3>
 
-            ${
-                data.alertas.length > 3
-                    ? `<p><strong>...e mais ${data.alertas.length - 3} equipamentos.</strong></p>`
-                    : ""
-            }
-            `
+        ${listaPrincipais}
+
+        ${
+            data.alertas.length > 3
+                ? `
+                    <p>
+                        <strong>
+                            ...e mais
+                            ${data.alertas.length - 3}
+                            equipamentos.
+                        </strong>
+                    </p>
+                  `
+                : ""
+        }
+        `
     );
-    
-    
 }
+
+
+// ==========================
+// DETALHES DO EPI
+// ==========================
 
 function mostrarDetalhesEpi(id) {
 
-    const epi = epiDashboard.find(e => e.id === id);
+    const epi =
+        epiDashboard.find(e => e.id === id);
 
     if (!epi) return;
 
@@ -164,29 +272,44 @@ function mostrarDetalhesEpi(id) {
         epi.nome,
 
         `
-        <p><strong>Lote:</strong> ${epi.lote}</p>
+        <p>
+            <strong>Lote:</strong>
+            ${epi.lote}
+        </p>
 
-        <p><strong>Quantidade:</strong> ${epi.quantidade}</p>
+        <p>
+            <strong>Quantidade:</strong>
+            ${epi.quantidade}
+        </p>
 
-        <p><strong>Descrição:</strong> ${epi.descricao || "-"}</p>
+        <p>
+            <strong>Descrição:</strong>
+            ${epi.descricao || "-"}
+        </p>
 
-        <p><strong>Validade:</strong>
-
+        <p>
+            <strong>Validade:</strong>
             ${
                 epi.vencimento
-                    ? new Date(epi.vencimento).toLocaleDateString("pt-BR")
+                    ? formatDateISOtoBR(epi.vencimento)
                     : "-"
             }
-
         </p>
         `
     );
-
 }
+
+
+// ==========================
+// DETALHES DO ALERTA
+// ==========================
 
 function abrirDetalhesAlerta(id) {
 
-    const alerta = dashboardData.alertas.find(a => a.id === id);
+    const alerta =
+        dashboardData.alertas.find(
+            a => a.id === id
+        );
 
     if (!alerta) return;
 
@@ -194,19 +317,39 @@ function abrirDetalhesAlerta(id) {
 
     if (alerta.funcionarios.length === 0) {
 
-        funcionarios = "<p>Nenhum funcionário recebeu este EPI.</p>";
+        funcionarios =
+            "<p>Nenhum funcionário recebeu este EPI.</p>";
 
     } else {
 
         funcionarios = `
             <ul class="space-y-3">
+
                 ${alerta.funcionarios.map(f => `
+
                     <li class="border-b-2 border-gray-200 pb-3">
-                         <strong>Funcionário:</strong> ${f.nome}<br>
-                        <strong>Matrícula:</strong> ${f.id}<br>
-                        <strong>Entrega:</strong> ${new Date(f.dataEntrega).toLocaleDateString("pt-BR")}
+
+                        <strong>Funcionário:</strong>
+                        ${f.nome}
+                        <br>
+
+                        <strong>Matrícula:</strong>
+                        ${f.id}
+                        <br>
+
+                        <strong>Entrega:</strong>
+                        ${
+                            f.dataEntrega
+                                ? formatDateISOtoBR(
+                                    f.dataEntrega
+                                  )
+                                : "-"
+                        }
+
                     </li>
+
                 `).join("")}
+
             </ul>
         `;
     }
@@ -214,30 +357,71 @@ function abrirDetalhesAlerta(id) {
     let statusTexto = "";
 
     if (alerta.diasParaVencer < 0) {
-        statusTexto = `🔴 Vencido há ${Math.abs(alerta.diasParaVencer)} dias`;
+
+        statusTexto =
+            `🔴 Vencido há ${
+                Math.abs(alerta.diasParaVencer)
+            } dias`;
+
     }
+
     else if (alerta.diasParaVencer <= 30) {
-        statusTexto = `🟠 Vence em ${alerta.diasParaVencer} dias`;
+
+        statusTexto =
+            `🟠 Vence em ${
+                alerta.diasParaVencer
+            } dias`;
+
     }
+
     else if (alerta.diasParaVencer <= 45) {
-        statusTexto = `🟡 Vence em ${alerta.diasParaVencer} dias`;
+
+        statusTexto =
+            `🟡 Vence em ${
+                alerta.diasParaVencer
+            } dias`;
+
     }
+
     else {
-        statusTexto = `🟢 Vence em ${alerta.diasParaVencer} dias`;
+
+        statusTexto =
+            `🟢 Vence em ${
+                alerta.diasParaVencer
+            } dias`;
+
     }
 
     abrirModal(
+
         alerta.nome,
+
         `
-        <p><strong>Lote:</strong> ${alerta.lote}</p>
-
-        <p><strong>Quantidade:</strong> ${alerta.quantidade}</p>
-
-        <p><strong>Validade:</strong>
-            ${new Date(alerta.vencimento).toLocaleDateString("pt-BR")}
+        <p>
+            <strong>Lote:</strong>
+            ${alerta.lote}
         </p>
 
-        <p><strong>Status:</strong> ${statusTexto}</p>
+        <p>
+            <strong>Quantidade:</strong>
+            ${alerta.quantidade}
+        </p>
+
+        <p>
+            <strong>Validade:</strong>
+            ${
+                alerta.vencimento
+                    ? formatDateISOtoBR(
+                        alerta.vencimento
+                      )
+                    : "-"
+            }
+        </p>
+
+        <p>
+            <strong>Status:</strong>
+            ${statusTexto}
+        </p>
 
         <hr>
 
@@ -249,51 +433,81 @@ function abrirDetalhesAlerta(id) {
 }
 
 
+// ==========================
+// CARREGA DASHBOARD
+// ==========================
+
 async function loadDashboard() {
 
     try {
 
-        const response = await fetch(`${API_URL}/dashboard/stats`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
+        const response =
+            await fetch(
+                `${API_URL}/dashboard/stats`,
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${token}`
+                    }
+                }
+            );
 
         if (!response.ok) {
-            throw new Error("Erro ao carregar dashboard");
+
+            throw new Error(
+                "Erro ao carregar dashboard"
+            );
+
         }
 
-        const data = await response.json();
+        const data =
+            await response.json();
+
         epiDashboard = data.epis;
 
         dashboardData = data;
+
         verificarLembrete(data);
 
+
         // ==========================
-        // Cards superiores
+        // CARDS SUPERIORES
         // ==========================
 
-        document.getElementById("totalEstoque").textContent =
+        document.getElementById(
+            "totalEstoque"
+        ).textContent =
             data.estoqueTotal;
 
-        document.getElementById("verde").textContent =
+        document.getElementById(
+            "verde"
+        ).textContent =
             data.verde;
 
-        document.getElementById("amarelo").textContent =
+        document.getElementById(
+            "amarelo"
+        ).textContent =
             data.amarelo;
 
-        document.getElementById("laranja").textContent =
+        document.getElementById(
+            "laranja"
+        ).textContent =
             data.laranja;
 
-        document.getElementById("vermelho").textContent =
+        document.getElementById(
+            "vermelho"
+        ).textContent =
             data.vermelho;
 
+
         // ==========================
-        // Lista de Alertas
+        // LISTA DE ALERTAS
         // ==========================
 
         const listaAlertas =
-            document.getElementById("listaAlertas");
+            document.getElementById(
+                "listaAlertas"
+            );
 
         if (data.alertas.length === 0) {
 
@@ -314,24 +528,38 @@ async function loadDashboard() {
                     switch (alerta.status) {
 
                         case "vermelho":
-                             cor = "border-red-500 bg-red-50";
+
+                            cor =
+                                "border-red-500 bg-red-50";
+
                             icone = "🔴";
+
                             break;
 
                         case "laranja":
-                            cor = "border-orange-500 bg-orange-50";
+
+                            cor =
+                                "border-orange-500 bg-orange-50";
+
                             icone = "🟠";
+
                             break;
 
                         case "amarelo":
-                            cor = "border-yellow-500 bg-yellow-50";
+
+                            cor =
+                                "border-yellow-500 bg-yellow-50";
+
                             icone = "🟡";
+
                             break;
 
                         default:
-                            cor = "border-green-500 bg-green-50";
-                            icone = "🟢";
 
+                            cor =
+                                "border-green-500 bg-green-50";
+
+                            icone = "🟢";
                     }
 
                     const funcionarios =
@@ -342,7 +570,8 @@ async function loadDashboard() {
                             : "Nenhum funcionário";
 
                     return `
-                         <div
+
+                        <div
                             onclick="abrirDetalhesAlerta(${alerta.id})"
                             class="
                                 cursor-pointer
@@ -355,15 +584,32 @@ async function loadDashboard() {
                             "
                         >
 
-                            <div class="flex justify-between items-start">
+                            <div
+                                class="
+                                    flex
+                                    justify-between
+                                    items-start
+                                "
+                            >
 
                                 <div>
 
-                                    <h3 class="font-semibold text-slate-800">
-                                        ${icone} ${alerta.nome}
+                                    <h3
+                                        class="
+                                            font-semibold
+                                            text-slate-800
+                                        "
+                                    >
+                                        ${icone}
+                                        ${alerta.nome}
                                     </h3>
 
-                                    <p class="text-sm text-slate-600">
+                                    <p
+                                        class="
+                                            text-sm
+                                            text-slate-600
+                                        "
+                                    >
                                         Lote ${alerta.lote}
                                     </p>
 
@@ -371,33 +617,55 @@ async function loadDashboard() {
 
                             </div>
 
-                            <div class="mt-3 text-sm text-slate-600">
+                            <div
+                                class="
+                                    mt-3
+                                    text-sm
+                                    text-slate-600
+                                "
+                            >
 
                                 <p>
-                                    <strong>Quantidade:</strong>
+                                    <strong>
+                                        Quantidade:
+                                    </strong>
+
                                     ${alerta.quantidade}
                                 </p>
 
                                 <p>
-                                    <strong>Validade:</strong>
-                                    ${new Date(alerta.vencimento).toLocaleDateString("pt-BR")}
+                                    <strong>
+                                        Validade:
+                                    </strong>
+
+                                    ${
+                                        alerta.vencimento
+                                            ? formatDateISOtoBR(
+                                                alerta.vencimento
+                                              )
+                                            : "-"
+                                    }
                                 </p>
 
                             </div>
 
                         </div>
-                        `;
+
+                    `;
 
                 }).join("");
 
         }
 
+
         // ==========================
-        // Lista de EPIs
+        // LISTA DE EPIs
         // ==========================
 
         const listaEpis =
-            document.getElementById("listaEpis");
+            document.getElementById(
+                "listaEpis"
+            );
 
         listaEpis.innerHTML =
             data.epis.map(epi => {
@@ -406,13 +674,19 @@ async function loadDashboard() {
 
                 if (epi.vencimento) {
 
-                    const hoje = new Date();
+                    const hojeStr =
+                        new Date()
+                            .toISOString()
+                            .split("T")[0];
+
+                    const vencimentoStr =
+                        epi.vencimento
+                            .split("T")[0];
 
                     const dias =
-                        Math.ceil(
-                            (new Date(epi.vencimento) - hoje)
-                            /
-                            (1000 * 60 * 60 * 24)
+                        daysDiffUTC(
+                            hojeStr,
+                            vencimentoStr
                         );
 
                     if (dias < 0)
@@ -426,18 +700,23 @@ async function loadDashboard() {
 
                     else
                         status = "verde";
-
                 }
 
                 let icone = "🟢";
 
-                if (status === "vermelho") icone = "🔴";
-                if (status === "laranja") icone = "🟠";
-                if (status === "amarelo") icone = "🟡";
+                if (status === "vermelho")
+                    icone = "🔴";
+
+                if (status === "laranja")
+                    icone = "🟠";
+
+                if (status === "amarelo")
+                    icone = "🟡";
+
 
                 return `
 
-                     <div
+                    <div
                         onclick="mostrarDetalhesEpi(${epi.id})"
                         class="
                             bg-white
@@ -453,51 +732,106 @@ async function loadDashboard() {
                         "
                     >
 
-                        <div class="flex justify-between items-start">
+                        <div
+                            class="
+                                flex
+                                justify-between
+                                items-start
+                            "
+                        >
 
                             <div>
 
-                                <h3 class="font-semibold text-slate-800">
-                                    ${icone} ${epi.nome}
+                                <h3
+                                    class="
+                                        font-semibold
+                                        text-slate-800
+                                    "
+                                >
+                                    ${icone}
+                                    ${epi.nome}
                                 </h3>
 
-                                <p class="text-sm text-slate-500">
+                                <p
+                                    class="
+                                        text-sm
+                                        text-slate-500
+                                    "
+                                >
                                     Lote ${epi.lote}
                                 </p>
 
                             </div>
 
-                            <i class="fa-solid fa-chevron-right text-slate-400"></i>
+                            <i
+                                class="
+                                    fa-solid
+                                    fa-chevron-right
+                                    text-slate-400
+                                "
+                            ></i>
 
                         </div>
 
-                        <div class="mt-4 grid grid-cols-2 gap-4">
+
+                        <div
+                            class="
+                                mt-4
+                                grid
+                                grid-cols-2
+                                gap-4
+                            "
+                        >
 
                             <div>
 
-                                <p class="text-xs uppercase text-slate-400">
+                                <p
+                                    class="
+                                        text-xs
+                                        uppercase
+                                        text-slate-400
+                                    "
+                                >
                                     Validade
                                 </p>
 
-                                <p class="font-medium">
+                                <p
+                                    class="
+                                        font-medium
+                                    "
+                                >
 
                                     ${
                                         epi.vencimento
-                                        ? new Date(epi.vencimento).toLocaleDateString("pt-BR")
-                                        : "-"
+                                            ? formatDateISOtoBR(
+                                                epi.vencimento
+                                              )
+                                            : "-"
                                     }
 
                                 </p>
 
                             </div>
 
+
                             <div>
 
-                                <p class="text-xs uppercase text-slate-400">
+                                <p
+                                    class="
+                                        text-xs
+                                        uppercase
+                                        text-slate-400
+                                    "
+                                >
                                     Estoque
                                 </p>
 
-                                <p class="font-bold text-lg">
+                                <p
+                                    class="
+                                        font-bold
+                                        text-lg
+                                    "
+                                >
                                     ${epi.quantidade}
                                 </p>
 
@@ -507,7 +841,7 @@ async function loadDashboard() {
 
                     </div>
 
-                    `;
+                `;
 
             }).join("");
 
@@ -521,13 +855,15 @@ async function loadDashboard() {
 
 }
 
+
 // ==========================
 // BOTÕES
 // ==========================
 
 function setupQuickActions() {
 
-    const botoes = document.querySelectorAll(".btn");
+    const botoes =
+        document.querySelectorAll(".btn");
 
     if (botoes[0]) {
 
@@ -564,6 +900,7 @@ function setupQuickActions() {
 
 }
 
+
 // ==========================
 // INICIALIZAÇÃO
 // ==========================
@@ -571,27 +908,39 @@ function setupQuickActions() {
 async function init() {
 
     document
-    .getElementById("closeModal")
-    .addEventListener("click", fecharModal);
+        .getElementById("closeModal")
+        .addEventListener(
+            "click",
+            fecharModal
+        );
 
     document
-    .getElementById("modalOverlay")
-    .addEventListener("click", (e) => {
+        .getElementById("modalOverlay")
+        .addEventListener(
+            "click",
+            (e) => {
 
-        if (e.target.id === "modalOverlay") {
+                if (
+                    e.target.id ===
+                    "modalOverlay"
+                ) {
 
-            fecharModal();
+                    fecharModal();
 
-        }
+                }
 
-    });
+            }
+        );
 
     setupQuickActions();
 
     await loadDashboard();
 
     // Atualiza automaticamente
-    setInterval(loadDashboard, 30000);
+    setInterval(
+        loadDashboard,
+        30000
+    );
 
 }
 
