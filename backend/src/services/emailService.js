@@ -1,20 +1,16 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // false para porta 587 (TLS)
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
-    },
-    family: 4 // força IPv4, evita o erro ENETUNREACH em ambientes sem saída IPv6 (ex: Render)
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Remetente padrão do Resend no plano free (sem domínio verificado).
+// Depois que você verificar um domínio próprio, pode trocar por
+// algo como "Sistema EPI <alertas@seudominio.com.br>".
+const REMETENTE = "Sistema EPI <onboarding@resend.dev>";
 
 async function enviarEmailTeste() {
 
-    const info = await transporter.sendMail({
-        from: `"Sistema EPI" <${process.env.EMAIL_USER}>`,
+    const { data, error } = await resend.emails.send({
+        from: REMETENTE,
         to: "sistemaepisenai@gmail.com",
         subject: "Teste de envio - Sistema EPI",
         html: `
@@ -39,7 +35,12 @@ async function enviarEmailTeste() {
         `
     });
 
-    console.log("E-mail enviado:", info.messageId);
+    if (error) {
+        console.error("Erro ao enviar e-mail de teste:", error);
+        throw error;
+    }
+
+    console.log("E-mail enviado:", data.id);
 }
 
 function formatarData(data) {
@@ -54,12 +55,12 @@ async function enviarEmailAlertaVencimento({
     destinatario,    funcionario,    matricula,
     setor,    epi,    lote,    vencimento,    diasParaVencer}) {
 
-        
-    console.log(`📨 Enviando e-mail para: ${destinatario}`);    
 
-    const info = await transporter.sendMail({
+    console.log(`📨 Enviando e-mail para: ${destinatario}`);
 
-        from: `"Sistema EPI" <${process.env.EMAIL_USER}>`,
+    const { data, error } = await resend.emails.send({
+
+        from: REMETENTE,
 
         to: destinatario,
 
@@ -124,8 +125,13 @@ async function enviarEmailAlertaVencimento({
         `
     });
 
+    if (error) {
+        console.error("Erro ao enviar alerta de vencimento:", error);
+        throw error;
+    }
+
     console.log(
-        `📧 Alerta enviado com sucesso: ${info.messageId}`
+        `📧 Alerta enviado com sucesso: ${data.id}`
     );
 }
 
