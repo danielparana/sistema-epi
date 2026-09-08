@@ -2,17 +2,64 @@ const prisma = require('../prisma/client')
 
 class DeliveryController {
   async list(req, res) {
-    try {
-      const deliveries = await prisma.delivery.findMany({
-        include: {
-          employee: true,
-          epi: true
-        }
-      })
-      return res.json(deliveries)
-    } catch (error) {
-      return res.status(500).json({ error: 'Erro ao listar entregas' })
-    }
+      try {
+
+          const page = Math.max(parseInt(req.query.page) || 1, 1);
+
+          const limit = Math.min(
+              Math.max(parseInt(req.query.limit) || 10, 1),
+              100
+          );
+
+          const skip = (page - 1) * limit;
+
+          const [deliveries, totalRecords] = await Promise.all([
+
+              prisma.delivery.findMany({
+
+                  skip,
+                  take: limit,
+
+                  include: {
+                      employee: true,
+                      epi: true
+                  },
+
+                  orderBy: {
+                      dataEntrega: 'desc'
+                  }
+
+              }),
+
+              prisma.delivery.count()
+
+          ]);
+
+          const totalPages = Math.ceil(totalRecords / limit);
+
+          return res.json({
+
+              data: deliveries,
+
+              meta: {
+                  totalRecords,
+                  currentPage: page,
+                  totalPages,
+                  limit
+              }
+
+          });
+
+      } catch (error) {
+
+          console.error('Erro ao listar entregas:', error);
+
+          return res.status(500).json({
+              error: 'Erro ao listar entregas'
+          });
+
+      }
+
   }
 
   async create(req, res) {

@@ -126,7 +126,10 @@ async function carregarFuncionarios(token) {
 
     if (!response.ok) { handleApiError(response); return; }
 
-    employees = await response.json();
+    
+    const json = await response.json();
+    employees = Array.isArray(json) ? json : (json.data || json.funcionarios || json.employees || []);
+
     if (employeeSelect) {
         employeeSelect.innerHTML = '<option value="">Selecione o funcionário</option>';
         employees.forEach(employee => {
@@ -143,6 +146,9 @@ async function carregarEpis(token) {
     if (!response.ok) { handleApiError(response); return; }
 
     epis = await response.json();
+
+    epis = result.data || []; // Blindagem contra payloads inconsistentes da API
+
     if (epiSelect) {
         epiSelect.innerHTML = '<option value="">Selecione o EPI</option>';
         // Filtra apenas EPIs que possuem estoque no front-end
@@ -166,7 +172,9 @@ async function carregarTabelaEntregas(token) {
 
         if (!response.ok) { handleApiError(response); return; }
 
-        const data = await response.json();
+               
+        const json = await response.json();
+        const data = Array.isArray(json) ? json : (json.data || json.deliveries || []);
         
         // Blindagem de payload: Previne a quebra do map se a API omitir relações (employee/epi)
         allDeliveries = data.map(d => ({

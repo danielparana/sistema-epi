@@ -3,16 +3,61 @@ const prisma = require('../prisma/client')
 class EmployeeController {
   async list(req, res) {
     try {
-      const employees = await prisma.employee.findMany({
-        where: {
-          active: true
-        }
-      })
+      
+          const page = Math.max(parseInt(req.query.page) || 1, 1);
+          const limit = Math.min(
+              Math.max(parseInt(req.query.limit) || 10, 1),
+              100
+          );
 
-      return res.json(employees)
-    } catch (error) {
-      return res.status(500).json({ error: 'Erro ao listar funcionários' })
-    }
+          const skip = (page - 1) * limit;
+
+          const [employees, totalRecords] = await Promise.all([
+
+              prisma.employee.findMany({
+                  where: {
+                      active: true
+                  },
+                  skip,
+                  take: limit,
+                  orderBy: {
+                      id: 'asc'
+                  }
+              }),
+
+              prisma.employee.count({
+                  where: {
+                      active: true
+                  }
+              })
+
+          ]);
+
+          const totalPages = Math.ceil(totalRecords / limit);
+
+          return res.json({
+
+              data: employees,
+
+              meta: {
+                  totalRecords,
+                  currentPage: page,
+                  totalPages,
+                  limit
+              }
+
+          });
+
+      } catch (error) {
+
+          console.error('Erro ao listar funcionários:', error);
+
+          return res.status(500).json({
+              error: 'Erro ao listar funcionários'
+          });
+
+      }
+
   }
 
   async create(req, res) {

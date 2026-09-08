@@ -150,10 +150,11 @@ async function carregarEpis() {
             throw new Error('Falha ao carregar os EPIs');
         }
 
-        const data = await response.json();
+        const data = await response.json();        
+        const listaEpis = Array.isArray(data) ? data : (data.data || data.epis || []);
         
         // Blindagem contra payloads inconsistentes da API
-        episExistentes = data.map(ep => ({
+        episExistentes = listaEpis.map(ep => ({
             ...ep,
             id: ep.id || "N/A",
             nome: ep.nome || "Nome não informado",

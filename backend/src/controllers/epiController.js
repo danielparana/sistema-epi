@@ -2,12 +2,56 @@ const prisma = require('../prisma/client')
 
 class EpiController {
   async list(req, res) {
+     
     try {
-      const epis = await prisma.epi.findMany()
-      return res.json(epis)
-    } catch (error) {
-      return res.status(500).json({ error: 'Erro ao listar EPIs' })
-    }
+
+          const page = Math.max(parseInt(req.query.page) || 1, 1);
+          const limit = Math.min(
+              Math.max(parseInt(req.query.limit) || 10, 1),
+              100
+          );
+
+          const skip = (page - 1) * limit;
+
+          const [epis, totalRecords] = await Promise.all([
+
+              prisma.epi.findMany({
+                  skip,
+                  take: limit,
+                  orderBy: {
+                      id: 'asc'
+                  }
+              }),
+
+              prisma.epi.count()
+
+          ]);
+
+          const totalPages = Math.ceil(totalRecords / limit);
+
+          return res.json({
+
+              data: epis,
+
+              meta: {
+                  totalRecords,
+                  currentPage: page,
+                  totalPages,
+                  limit
+              }
+
+          });
+
+      } catch (error) {
+
+          console.error('Erro ao listar EPIs:', error);
+
+          return res.status(500).json({
+              error: 'Erro ao listar EPIs'
+          });
+
+      }
+
   }
 
   async create(req, res) {

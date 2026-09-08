@@ -7,8 +7,10 @@ const cpfInput = document.getElementById("cpf");
 const cpfError = document.getElementById("cpfError");
 
 let allEmployees = []; // Memória local para evitar DOM scraping
-let displayedCount = 5; // Quantidade inicial na tela
-let editingEmployeeId = null;
+let currentPage = 1; // Página atual para paginação
+const pageLimit = 5; // Limite de funcionários por página
+let totalPages = 1; // Total de páginas calculado após carregar os funcionários
+let editingEmployeeId = null; // ID do funcionário atualmente em edição (null se não estiver editando)
 
 // ==========================================
 // MÁSCARA E VALIDAÇÃO DE CPF
@@ -67,7 +69,7 @@ function renderEmployees() {
     employeeTable.innerHTML = '';
     
     // Filtra apenas a quantidade que deve aparecer na tela
-    const toShow = allEmployees.slice(0, displayedCount);
+    const toShow = allEmployees;
 
     if (toShow.length === 0) {
         employeeTable.innerHTML = `
@@ -125,12 +127,17 @@ function renderEmployees() {
     });
 
     // Injeta o botão "Carregar Mais" se houver funcionários ocultos
-    if (allEmployees.length > displayedCount) {
+        if (currentPage < totalPages) {
         employeeTable.innerHTML += `
             <tr class="block lg:table-row border-none w-full">
                 <td colspan="5" class="p-4 text-center border-none block lg:table-cell w-full">
-                    <button type="button" onclick="carregarMais()" class="w-full lg:w-auto bg-white border-2 border-slate-200 hover:border-brand-500 text-slate-700 hover:text-brand-600 font-medium py-3 px-8 rounded-xl transition-all shadow-sm">
-                        Ver mais funcionários (${allEmployees.length - displayedCount} restantes)
+                    <button
+                        type="button"
+                        onclick="carregarMais()"
+                        class="w-full lg:w-auto bg-white border-2 border-slate-200 hover:border-brand-500 text-slate-700 hover:text-brand-600 font-medium py-3 px-8 rounded-xl transition-all shadow-sm">
+
+                        Ver mais funcionários
+
                     </button>
                 </td>
             </tr>
@@ -140,44 +147,97 @@ function renderEmployees() {
     aplicarPermissoes();
 }
 // Aumenta o limite de exibição e re-renderiza
-window.carregarMais = function() {
-    displayedCount += 5;
-    renderEmployees();
+window.carregarMais = async function() {
+
+    if (currentPage >= totalPages) {
+        return;
+    }
+
+    await carregarFuncionarios(currentPage + 1);
 };
 
 // ==========================================
 // COMUNICAÇÃO COM A API (CRUD)
 // ==========================================
-async function carregarFuncionarios() {
+async function carregarFuncionarios(page = 1) {
     const token = localStorage.getItem('token');
-    if (!token) { window.location.href = 'login.html'; return; }
+
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
 
     try {
-        const response = await fetch(`${API_URL}/employees`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+
+        const response = await fetch(
+            `${API_URL}/employees?page=${page}&limit=${pageLimit}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
 
         if (!response.ok) {
-            localStorage.removeItem('token');
-            window.location.href = 'login.html';
-            return;
+
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            throw new Error('Falha ao carregar funcionários');
         }
 
-        allEmployees = await response.json();
-        
-        // Formata os CPFs vindos do banco para exibição visual padrão (com validação de existência)
+        const result = await response.json();
+
+        // Nova estrutura da API
+        const employees = result.data || [];
+        const meta = result.meta || {};
+
+        currentPage = meta.currentPage || page;
+        totalPages = meta.totalPages || 1;
+
+        // Adiciona os novos funcionários à memória local
+        if (page === 1) {
+            allEmployees = employees;
+        } else {
+            allEmployees = [...allEmployees, ...employees];
+        }
+
+        // Formata os CPFs vindos do banco
         allEmployees = allEmployees.map(emp => {
-            if (!emp.cpf) return emp; // Ignora se não houver CPF
+
+            if (!emp.cpf) return emp;
+
             const rawCpf = String(emp.cpf).replace(/\D/g, '');
-            const formattedCpf = rawCpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2}).*/, '$1.$2.$3-$4');
-            return { ...emp, cpf: formattedCpf };
+
+            const formattedCpf = rawCpf.replace(
+                /^(\d{3})(\d{3})(\d{3})(\d{2}).*/,
+                '$1.$2.$3-$4'
+            );
+
+            return {
+                ...emp,
+                cpf: formattedCpf
+            };
+
         });
 
         renderEmployees();
 
     } catch (error) {
+
         console.error(error);
-        employeeTable.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500 font-medium block md:table-cell w-full">Erro de conexão com o servidor.</td></tr>`;
+
+        employeeTable.innerHTML = `
+            <tr>
+                <td colspan="5"
+                    class="p-4 text-center text-red-500 font-medium block md:table-cell w-full">
+                    Erro de conexão com o servidor.
+                </td>
+            </tr>
+        `;
     }
 }
 
@@ -261,8 +321,10 @@ employeeForm.addEventListener("submit", async (e) => {
         submitBtn.classList.replace('bg-green-600', 'bg-brand-600');
         submitBtn.classList.replace('hover:bg-green-700', 'hover:bg-brand-700');
 
-        // Volta a paginação para 5 para exibir o novo usuário no topo
-        displayedCount = 5; 
+        // Volta a paginação 
+        displayedCount = 1;
+        allEmployees = [];
+
         await carregarFuncionarios();
 
         alert(method === 'POST' ? "Funcionário cadastrado com sucesso!" : "Funcionário atualizado com sucesso!");
