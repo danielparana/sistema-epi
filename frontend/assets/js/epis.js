@@ -17,9 +17,17 @@ const historyModalOverlay = document.getElementById('historyModalOverlay');
 const historyModalContent = document.getElementById('historyModalContent');
 const historyModalSubtitle = document.getElementById('historyModalSubtitle');
 const closeHistoryModalBtn = document.getElementById('closeHistoryModal');
+// Elementos de busca
+const searchEpiInput = document.getElementById('searchEpi');
+const clearSearchEpiBtn = document.getElementById('clearSearchEpi');
+const searchEpiInfo = document.getElementById('searchEpiInfo');
 
-let episExistentes = []; // Memória local de EPIs
-let displayedCount = 5;  // Quantidade inicial na tela
+let episExistentes = []; // EPIs carregados atualmente
+let currentPage = 1;
+let totalPages = 1;
+let totalRecords = 0;
+let searchTerm = '';
+let loadingEpis = false;
 let editingEpiId = null;
 
 // ==========================================
@@ -30,7 +38,7 @@ function renderEpis() {
     epiTable.innerHTML = '';
 
     // Filtra apenas a quantidade que deve aparecer na tela
-    const toShow = episExistentes.slice(0, displayedCount);
+    const toShow = episExistentes;
 
     if (toShow.length === 0) {
         epiTable.innerHTML = `
@@ -108,68 +116,144 @@ function renderEpis() {
 `;
     });
 
-    // Injeta botão de paginação com suporte total a blocos no mobile
-    if (episExistentes.length > displayedCount) {
-    epiTable.innerHTML += `
-        <tr class="block lg:table-row border-none w-full">
-            <td colspan="9" class="p-4 text-center border-none block lg:table-cell w-full">
-                <button type="button" onclick="carregarMaisEpis()" class="w-full lg:w-auto bg-white border-2 border-slate-200 hover:border-brand-500 text-slate-700 hover:text-brand-600 font-medium py-3 px-8 rounded-xl transition-all shadow-sm">
-                    Ver mais EPIs (${episExistentes.length - displayedCount} restantes)
-                </button>
-            </td>
-        </tr>
-    `;
+    if (currentPage < totalPages) {
+        const restantes = totalRecords - episExistentes.length;
+
+        epiTable.innerHTML += `
+            <tr class="block lg:table-row border-none w-full">
+                <td colspan="9" class="p-4 text-center border-none block lg:table-cell w-full">
+                    <button
+                        type="button"
+                        onclick="carregarMaisEpis()"
+                        class="w-full lg:w-auto bg-white border-2 border-slate-200 hover:border-brand-500 text-slate-700 hover:text-brand-600 font-medium py-3 px-8 rounded-xl transition-all shadow-sm"
+                    >
+                        Ver mais EPIs (${restantes} restantes)
+                    </button>
+                </td>
+            </tr>
+        `;
 }
 
     if (typeof aplicarPermissoesGlobais === 'function') aplicarPermissoesGlobais();
 }
 
-window.carregarMaisEpis = function() {
-    displayedCount += 5;
-    renderEpis();
+window.carregarMaisEpis = async function() {
+
+    if (loadingEpis) return;
+
+    if (currentPage >= totalPages) return;
+
+    await carregarEpis(false);
 };
 
 // ==========================================
 // COMUNICAÇÃO COM A API (CRUD)
 // ==========================================
-async function carregarEpis() {
+async function carregarEpis(reset = true) {
+
     const token = localStorage.getItem('token');
-    if (!token) { window.location.href = 'login.html'; return; }
+
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    if (loadingEpis) return;
+
+    loadingEpis = true;
 
     try {
-        const response = await fetch(`${API_URL}/epis`, {
-            headers: { Authorization: `Bearer ${token}` }
+
+        const page = reset ? 1 : currentPage + 1;
+
+        const params = new URLSearchParams({
+            page,
+            limit: 5
         });
 
+        if (searchTerm) {
+            params.set('search', searchTerm);
+        }
+
+        const response = await fetch(
+            `${API_URL}/epis?${params.toString()}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
         if (!response.ok) {
+
             if (response.status === 401) {
                 localStorage.removeItem('token');
                 window.location.href = 'login.html';
                 return;
             }
+
             throw new Error('Falha ao carregar os EPIs');
         }
 
-        const data = await response.json();        
-        const listaEpis = Array.isArray(data) ? data : (data.data || data.epis || []);
-        
-        // Blindagem contra payloads inconsistentes da API
-        episExistentes = listaEpis.map(ep => ({
+        const result = await response.json();
+
+        const listaEpis = Array.isArray(result)
+            ? result
+            : (result.data || []);
+
+        const meta = result.meta || {};
+
+        currentPage = meta.currentPage || page;
+        totalPages = meta.totalPages || 1;
+        totalRecords = meta.totalRecords || listaEpis.length;
+
+        const episFormatados = listaEpis.map(ep => ({
             ...ep,
             id: ep.id || "N/A",
             nome: ep.nome || "Nome não informado",
             lote: ep.lote || "Não definido",
             descricao: ep.descricao || "Sem descrição",
             vencimento: ep.vencimento || "N/A",
-            quantidade: ep.quantidade !== undefined ? ep.quantidade : 0
+            quantidade: ep.quantidade !== undefined
+                ? ep.quantidade
+                : 0
         }));
-        
+
+        if (reset) {
+            episExistentes = episFormatados;
+        } else {
+            episExistentes = [
+                ...episExistentes,
+                ...episFormatados
+            ];
+        }
+
         renderEpis();
+
         populateEpiNames(episExistentes);
 
+        atualizarBuscaEpi();
+
     } catch (error) {
+
         console.error(error);
-        if (epiTable) epiTable.innerHTML = `<tr class="w-full block md:table-row"><td colspan="9" class="p-4 text-center text-red-500 w-full block md:table-cell">Erro de conexão com o servidor.</td></tr>`;
+
+        if (epiTable) {
+            epiTable.innerHTML = `
+                <tr class="w-full block md:table-row">
+                    <td
+                        colspan="9"
+                        class="p-4 text-center text-red-500 w-full block md:table-cell"
+                    >
+                        Erro de conexão com o servidor.
+                    </td>
+                </tr>
+            `;
+        }
+
+    } finally {
+
+        loadingEpis = false;
     }
 }
 
@@ -240,7 +324,7 @@ window.deletarEpi = async function(id) {
 
         alert('EPI excluído com sucesso!');
         if (editingEpiId === id) resetForm();
-        carregarEpis();
+        carregarEpis(true);
 
     } catch (error) {
         console.error(error);
@@ -394,14 +478,87 @@ if (epiForm) {
 
             const wasEditing = Boolean(editingEpiId);
             resetForm();
-            displayedCount = 5; 
             await carregarEpis();
-            alert(wasEditing ? 'EPI atualizado com sucesso!' : 'EPI cadastrado com sucesso!');
+            alert(wasEditing ? 'EPI atualizado com sucesso!'
+                             : 'EPI cadastrado com sucesso!'
+                            );
 
         } catch (error) {
             console.error(error);
             alert('Erro ao cadastrar EPI: ' + error.message);
         }
+    });
+}
+
+// ==========================================
+// BUSCA DE EPIs
+// ==========================================
+
+let searchTimeout = null;
+
+function atualizarBuscaEpi() {
+
+    if (!searchEpiInput) return;
+
+    const possuiBusca = searchTerm.length > 0;
+
+    if (clearSearchEpiBtn) {
+        clearSearchEpiBtn.classList.toggle('hidden', !possuiBusca);
+    }
+
+    if (searchEpiInfo) {
+
+        if (possuiBusca) {
+
+            searchEpiInfo.textContent =
+                `${totalRecords} EPI(s) encontrado(s) para "${searchTerm}"`;
+
+            searchEpiInfo.classList.remove('hidden');
+
+        } else {
+
+            searchEpiInfo.classList.add('hidden');
+        }
+    }
+}
+
+
+if (searchEpiInput) {
+
+    searchEpiInput.addEventListener('input', () => {
+
+        searchTerm = searchEpiInput.value.trim();
+
+        if (clearSearchEpiBtn) {
+            clearSearchEpiBtn.classList.toggle(
+                'hidden',
+                searchTerm.length === 0
+            );
+        }
+
+        clearTimeout(searchTimeout);
+
+        searchTimeout = setTimeout(() => {
+
+            carregarEpis(true);
+
+        }, 400);
+    });
+}
+
+
+if (clearSearchEpiBtn) {
+
+    clearSearchEpiBtn.addEventListener('click', () => {
+
+        searchEpiInput.value = '';
+        searchTerm = '';
+
+        clearSearchEpiBtn.classList.add('hidden');
+
+        carregarEpis(true);
+
+        searchEpiInput.focus();
     });
 }
 

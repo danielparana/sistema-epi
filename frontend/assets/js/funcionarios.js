@@ -6,11 +6,22 @@ const employeeTable = document.getElementById("employeeTable");
 const cpfInput = document.getElementById("cpf");
 const cpfError = document.getElementById("cpfError");
 
-let allEmployees = []; // Memória local para evitar DOM scraping
-let currentPage = 1; // Página atual para paginação
-const pageLimit = 5; // Limite de funcionários por página
-let totalPages = 1; // Total de páginas calculado após carregar os funcionários
-let editingEmployeeId = null; // ID do funcionário atualmente em edição (null se não estiver editando)
+// Elementos de busca
+const searchEmployeeInput = document.getElementById("searchEmployee");
+const clearSearchEmployeeBtn = document.getElementById("clearSearchEmployee");
+const searchEmployeeInfo = document.getElementById("searchEmployeeInfo");
+
+let allEmployees = [];
+let currentPage = 1;
+const pageLimit = 5;
+let totalPages = 1;
+let totalRecords = 0;
+
+let editingEmployeeId = null;
+
+let searchTerm = "";
+let loadingEmployees = false;
+let searchTimeout = null;
 
 // ==========================================
 // MÁSCARA E VALIDAÇÃO DE CPF
@@ -160,6 +171,7 @@ window.carregarMais = async function() {
 // COMUNICAÇÃO COM A API (CRUD)
 // ==========================================
 async function carregarFuncionarios(page = 1) {
+
     const token = localStorage.getItem('token');
 
     if (!token) {
@@ -167,10 +179,23 @@ async function carregarFuncionarios(page = 1) {
         return;
     }
 
+    if (loadingEmployees) return;
+
+    loadingEmployees = true;
+
     try {
 
+        const params = new URLSearchParams({
+            page,
+            limit: pageLimit
+        });
+
+        if (searchTerm) {
+            params.set('search', searchTerm);
+        }
+
         const response = await fetch(
-            `${API_URL}/employees?page=${page}&limit=${pageLimit}`,
+            `${API_URL}/employees?${params.toString()}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -191,18 +216,23 @@ async function carregarFuncionarios(page = 1) {
 
         const result = await response.json();
 
-        // Nova estrutura da API
         const employees = result.data || [];
         const meta = result.meta || {};
 
         currentPage = meta.currentPage || page;
         totalPages = meta.totalPages || 1;
+        totalRecords = meta.totalRecords || employees.length;
 
-        // Adiciona os novos funcionários à memória local
         if (page === 1) {
+
             allEmployees = employees;
+
         } else {
-            allEmployees = [...allEmployees, ...employees];
+
+            allEmployees = [
+                ...allEmployees,
+                ...employees
+            ];
         }
 
         // Formata os CPFs vindos do banco
@@ -213,7 +243,7 @@ async function carregarFuncionarios(page = 1) {
             const rawCpf = String(emp.cpf).replace(/\D/g, '');
 
             const formattedCpf = rawCpf.replace(
-                /^(\d{3})(\d{3})(\d{3})(\d{2}).*/,
+                /^(\d{3})(\d{3})(\d{3})(\d{2})$/,
                 '$1.$2.$3-$4'
             );
 
@@ -225,6 +255,8 @@ async function carregarFuncionarios(page = 1) {
         });
 
         renderEmployees();
+
+        atualizarBuscaFuncionario();
 
     } catch (error) {
 
@@ -238,6 +270,10 @@ async function carregarFuncionarios(page = 1) {
                 </td>
             </tr>
         `;
+
+    } finally {
+
+        loadingEmployees = false;
     }
 }
 
@@ -322,7 +358,6 @@ employeeForm.addEventListener("submit", async (e) => {
         submitBtn.classList.replace('hover:bg-green-700', 'hover:bg-brand-700');
 
         // Volta a paginação 
-        displayedCount = 1;
         allEmployees = [];
 
         await carregarFuncionarios();
@@ -352,7 +387,7 @@ window.desativarFuncionario = async function(id) {
         if (!response.ok) throw new Error("Erro ao desativar funcionário");
 
         alert("Funcionário desativado com sucesso!");
-        carregarFuncionarios();
+        carregarFuncionarios(1);
 
     } catch (error) {
         console.error(error);
@@ -378,6 +413,80 @@ function aplicarPermissoes() {
     if (user.role === "GERENTE") {
        deleteBtns.forEach(btn => btn.classList.add("hidden")); 
     }
+}
+
+// ==========================================
+// BUSCA DE FUNCIONÁRIOS
+// ==========================================
+
+function atualizarBuscaFuncionario() {
+
+    if (!searchEmployeeInput) return;
+
+    const possuiBusca = searchTerm.length > 0;
+
+    if (clearSearchEmployeeBtn) {
+        clearSearchEmployeeBtn.classList.toggle(
+            'hidden',
+            !possuiBusca
+        );
+    }
+
+    if (searchEmployeeInfo) {
+
+        if (possuiBusca) {
+
+            searchEmployeeInfo.textContent =
+                `${totalRecords} funcionário(s) encontrado(s) para "${searchTerm}"`;
+
+            searchEmployeeInfo.classList.remove('hidden');
+
+        } else {
+
+            searchEmployeeInfo.classList.add('hidden');
+        }
+    }
+}
+
+
+if (searchEmployeeInput) {
+
+    searchEmployeeInput.addEventListener('input', () => {
+
+        searchTerm = searchEmployeeInput.value.trim();
+
+        if (clearSearchEmployeeBtn) {
+
+            clearSearchEmployeeBtn.classList.toggle(
+                'hidden',
+                searchTerm.length === 0
+            );
+        }
+
+        clearTimeout(searchTimeout);
+
+        searchTimeout = setTimeout(() => {
+
+            carregarFuncionarios(1);
+
+        }, 400);
+    });
+}
+
+
+if (clearSearchEmployeeBtn) {
+
+    clearSearchEmployeeBtn.addEventListener('click', () => {
+
+        searchEmployeeInput.value = '';
+        searchTerm = '';
+
+        clearSearchEmployeeBtn.classList.add('hidden');
+
+        carregarFuncionarios(1);
+
+        searchEmployeeInput.focus();
+    });
 }
 
 // INICIALIZAÇÃO

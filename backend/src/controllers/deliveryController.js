@@ -2,65 +2,97 @@ const prisma = require('../prisma/client')
 
 class DeliveryController {
   async list(req, res) {
-      try {
+  try {
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
 
-          const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.min(
+      Math.max(parseInt(req.query.limit) || 5, 1),
+      100
+    );
 
-          const limit = Math.min(
-              Math.max(parseInt(req.query.limit) || 10, 1),
-              100
-          );
+    const search = (req.query.search || '').trim();
 
-          const skip = (page - 1) * limit;
+    const skip = (page - 1) * limit;
 
-          const [deliveries, totalRecords] = await Promise.all([
-
-              prisma.delivery.findMany({
-
-                  skip,
-                  take: limit,
-
-                  include: {
-                      employee: true,
-                      epi: true
-                  },
-
-                  orderBy: {
-                      dataEntrega: 'desc'
-                  }
-
-              }),
-
-              prisma.delivery.count()
-
-          ]);
-
-          const totalPages = Math.ceil(totalRecords / limit);
-
-          return res.json({
-
-              data: deliveries,
-
-              meta: {
-                  totalRecords,
-                  currentPage: page,
-                  totalPages,
-                  limit
+    const where = search
+      ? {
+          OR: [
+            {
+              employee: {
+                nome: {
+                  contains: search,
+                  mode: 'insensitive'
+                }
               }
+            },
+            {
+              employee: {
+                cpf: {
+                  contains: search,
+                  mode: 'insensitive'
+                }
+              }
+            },
+            {
+              epi: {
+                nome: {
+                  contains: search,
+                  mode: 'insensitive'
+                }
+              }
+            },
+            {
+              epi: {
+                lote: {
+                  contains: search,
+                  mode: 'insensitive'
+                }
+              }
+            }
+          ]
+        }
+      : {};
 
-          });
+    const [deliveries, totalRecords] = await Promise.all([
+      prisma.delivery.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          employee: true,
+          epi: true
+        },
+        orderBy: {
+          dataEntrega: 'desc'
+        }
+      }),
 
-      } catch (error) {
+      prisma.delivery.count({
+        where
+      })
+    ]);
 
-          console.error('Erro ao listar entregas:', error);
+    const totalPages = Math.ceil(totalRecords / limit);
 
-          return res.status(500).json({
-              error: 'Erro ao listar entregas'
-          });
-
+    return res.json({
+      data: deliveries,
+      meta: {
+        totalRecords,
+        currentPage: page,
+        totalPages,
+        limit,
+        search
       }
+    });
 
+  } catch (error) {
+    console.error('Erro ao listar entregas:', error);
+
+    return res.status(500).json({
+      error: 'Erro ao listar entregas'
+    });
   }
+}
 
   async create(req, res) {
     const { employeeId, epiId, quantidade } = req.body

@@ -12,8 +12,17 @@ const submitBtn = deliveryForm ? deliveryForm.querySelector('button[type="submit
 
 let employees = [];
 let epis = [];
-let allDeliveries = [];  // Memória local para a paginação
-let displayedCount = 5;  // Quantidade inicial na tela
+
+let allDeliveries = [];
+
+let currentPage = 1;
+const pageLimit = 5;
+let totalPages = 1;
+let totalRecords = 0;
+
+let searchTerm = "";
+let loadingDeliveries = false;
+let searchTimeout = null;
 
 // ==========================================
 // BOOTSTRAP DE DADOS
@@ -26,7 +35,7 @@ async function carregarEntregas() {
     await Promise.all([
         carregarFuncionarios(token), 
         carregarEpis(token), 
-        carregarTabelaEntregas(token)
+        carregarTabelaEntregas(token, 1)
     ]);
 }
 
@@ -42,68 +51,102 @@ function handleApiError(response) {
 // ==========================================
 function renderDeliveries() {
     if (!deliveryTable) return;
+
     deliveryTable.innerHTML = '';
 
-    const toShow = allDeliveries.slice(0, displayedCount);
-
-    if (toShow.length === 0) {
+    if (allDeliveries.length === 0) {
         deliveryTable.innerHTML = `
             <tr class="block lg:table-row w-full">
                 <td colspan="6" class="p-6 text-center text-sm text-slate-500 italic border-b-0 block lg:table-cell w-full">
-                    Nenhuma entrega registrada no sistema.
+                    ${searchTerm
+                        ? 'Nenhuma entrega encontrada para essa busca.'
+                        : 'Nenhuma entrega registrada no sistema.'}
                 </td>
-            </tr>`;
+            </tr>
+        `;
         return;
     }
 
-    // Classes responsivas e seguras ajustadas para lg (Tablets carregarão cards)
     const trClass = "flex flex-col lg:table-row bg-white border border-slate-200 lg:border-0 lg:border-b lg:border-slate-200 rounded-xl lg:rounded-none shadow-sm lg:shadow-none mb-4 lg:mb-0 hover:bg-slate-50 transition-colors overflow-hidden w-full";
     const tdClass = "p-4 lg:py-4 lg:px-4 text-sm text-slate-700 flex justify-between lg:table-cell items-center border-b border-slate-100 lg:border-0 last:border-0 w-full min-w-0";
     const labelClass = "lg:hidden font-semibold text-slate-900 shrink-0 mr-4";
 
-    toShow.forEach(delivery => {
+    allDeliveries.forEach(delivery => {
+
         const dataOrigem = delivery.dataEntrega || delivery.createdAt;
         const createdAt = dataOrigem ? new Date(dataOrigem) : new Date();
-        const formattedDate = `${createdAt.toLocaleDateString('pt-BR')} às ${createdAt.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}`;
+
+        const formattedDate = `${createdAt.toLocaleDateString('pt-BR')} às ${createdAt.toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        })}`;
 
         deliveryTable.innerHTML += `
             <tr class="${trClass}">
-                <td class="${tdClass} hidden lg:table-cell"><span class="font-medium text-slate-500">#${delivery.id}</span></td>
-                
+                <td class="${tdClass} hidden lg:table-cell">
+                    <span class="font-medium text-slate-500">#${delivery.id}</span>
+                </td>
+
                 <td class="${tdClass}">
                     <span class="${labelClass}">Funcionário</span>
-                    <strong class="text-slate-900 lg:font-medium text-right truncate ml-auto max-w-[65%] lg:max-w-none" title="${delivery.employee?.nome || 'Não identificado'}"><i class="fa-solid fa-user text-slate-400 mr-2 lg:hidden"></i>${delivery.employee?.nome || 'Não identificado'}</strong>
+                    <strong
+                        class="text-slate-900 lg:font-medium text-right truncate ml-auto max-w-[65%] lg:max-w-none"
+                        title="${delivery.employee?.nome || 'Não identificado'}"
+                    >
+                        <i class="fa-solid fa-user text-slate-400 mr-2 lg:hidden"></i>
+                        ${delivery.employee?.nome || 'Não identificado'}
+                    </strong>
                 </td>
-                
+
                 <td class="${tdClass}">
                     <span class="${labelClass}">EPI</span>
-                    <span class="text-slate-800 text-right truncate ml-auto max-w-[65%] lg:max-w-none" title="${delivery.epi?.nome || 'Não identificado'}"><i class="fa-solid fa-helmet-safety text-slate-400 mr-2 lg:hidden"></i>${delivery.epi?.nome || 'Não identificado'}</span>
+                    <span
+                        class="text-slate-800 text-right truncate ml-auto max-w-[65%] lg:max-w-none"
+                        title="${delivery.epi?.nome || 'Não identificado'}"
+                    >
+                        <i class="fa-solid fa-helmet-safety text-slate-400 mr-2 lg:hidden"></i>
+                        ${delivery.epi?.nome || 'Não identificado'}
+                    </span>
                 </td>
-                
+
                 <td class="${tdClass}">
                     <span class="${labelClass}">Lote</span>
-                    <span class="bg-slate-100 text-slate-700 py-1 px-3 rounded-md text-xs font-medium border border-slate-200 ml-auto truncate max-w-[50%] lg:max-w-none" title="${delivery.epi?.lote || '-'}">${delivery.epi?.lote || '-'}</span>
+                    <span
+                        class="bg-slate-100 text-slate-700 py-1 px-3 rounded-md text-xs font-medium border border-slate-200 ml-auto truncate max-w-[50%] lg:max-w-none"
+                        title="${delivery.epi?.lote || '-'}"
+                    >
+                        ${delivery.epi?.lote || '-'}
+                    </span>
                 </td>
-                
+
                 <td class="${tdClass}">
                     <span class="${labelClass}">Qtd. Entregue</span>
-                    <span class="font-bold text-brand-600 bg-brand-50 px-3 py-1 rounded-md border border-brand-100 ml-auto">${delivery.quantidade}</span>
+                    <span class="font-bold text-brand-600 bg-brand-50 px-3 py-1 rounded-md border border-brand-100 ml-auto">
+                        ${delivery.quantidade}
+                    </span>
                 </td>
-                
+
                 <td class="${tdClass} bg-slate-50 lg:bg-transparent">
                     <span class="${labelClass}">Data/Hora</span>
-                    <span class="text-slate-500 text-xs lg:text-sm lg:text-slate-700 ml-auto text-right"><i class="fa-regular fa-clock mr-1 hidden lg:inline"></i>${formattedDate}</span>
+                    <span class="text-slate-500 text-xs lg:text-sm lg:text-slate-700 ml-auto text-right">
+                        <i class="fa-regular fa-clock mr-1 hidden lg:inline"></i>
+                        ${formattedDate}
+                    </span>
                 </td>
             </tr>
         `;
     });
 
-    if (allDeliveries.length > displayedCount) {
+    if (currentPage < totalPages) {
         deliveryTable.innerHTML += `
             <tr class="block lg:table-row border-none w-full">
                 <td colspan="6" class="p-4 text-center border-none block lg:table-cell w-full">
-                    <button type="button" onclick="carregarMaisEntregas()" class="w-full lg:w-auto bg-white border-2 border-slate-200 hover:border-brand-500 text-slate-700 hover:text-brand-600 font-medium py-3 px-8 rounded-xl transition-all shadow-sm">
-                        Ver mais entregas (${allDeliveries.length - displayedCount} restantes)
+                    <button
+                        type="button"
+                        onclick="carregarMaisEntregas()"
+                        class="w-full lg:w-auto bg-white border-2 border-slate-200 hover:border-brand-500 text-slate-700 hover:text-brand-600 font-medium py-3 px-8 rounded-xl transition-all shadow-sm"
+                    >
+                        Ver mais entregas
                     </button>
                 </td>
             </tr>
@@ -111,9 +154,17 @@ function renderDeliveries() {
     }
 }
 
-window.carregarMaisEntregas = function() {
-    displayedCount += 5;
-    renderDeliveries();
+window.carregarMaisEntregas = async function() {
+    if (loadingDeliveries || currentPage >= totalPages) return;
+
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    await carregarTabelaEntregas(token, currentPage + 1);
 };
 
 // ==========================================
@@ -145,9 +196,11 @@ async function carregarEpis(token) {
 
     if (!response.ok) { handleApiError(response); return; }
 
-    epis = await response.json();
+    const result = await response.json();
 
-    epis = result.data || []; // Blindagem contra payloads inconsistentes da API
+    epis = Array.isArray(result)
+        ? result
+        : (result.data || result.epis || result.epi || []);
 
     if (epiSelect) {
         epiSelect.innerHTML = '<option value="">Selecione o EPI</option>';
@@ -164,35 +217,90 @@ async function carregarEpis(token) {
     }
 }
 
-async function carregarTabelaEntregas(token) {
+async function carregarTabelaEntregas(token, page = 1) {
+    if (loadingDeliveries) return;
+
+    loadingDeliveries = true;
+
     try {
-        const response = await fetch(`${API_URL}/deliveries`, {
-            headers: { Authorization: `Bearer ${token}` }
+        const params = new URLSearchParams({
+            page: page.toString(),
+            limit: pageLimit.toString()
         });
 
-        if (!response.ok) { handleApiError(response); return; }
+        if (searchTerm) {
+            params.set('search', searchTerm);
+        }
 
-               
+        const response = await fetch(
+            `${API_URL}/deliveries?${params.toString()}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        if (!response.ok) {
+            handleApiError(response);
+            return;
+        }
+
         const json = await response.json();
-        const data = Array.isArray(json) ? json : (json.data || json.deliveries || []);
-        
-        // Blindagem de payload: Previne a quebra do map se a API omitir relações (employee/epi)
-        allDeliveries = data.map(d => ({
+
+        const data = Array.isArray(json)
+            ? json
+            : (json.data || json.deliveries || []);
+
+        const meta = json.meta || {};
+
+        currentPage = meta.currentPage || page;
+        totalPages = meta.totalPages || 1;
+        totalRecords = meta.totalRecords || 0;
+
+        const deliveries = data.map(d => ({
             ...d,
             id: d.id || 'N/A',
             quantidade: d.quantidade || 0,
-            employee: { nome: d.employee?.nome || 'Funcionário Excluído' },
-            epi: { 
+
+            employee: {
+                ...(d.employee || {}),
+                nome: d.employee?.nome || 'Funcionário Excluído'
+            },
+
+            epi: {
+                ...(d.epi || {}),
                 nome: d.epi?.nome || 'EPI Excluído',
                 lote: d.epi?.lote || 'N/A'
             },
+
             dataEntrega: d.dataEntrega || d.createdAt || null
         }));
 
+        if (page === 1) {
+            allDeliveries = deliveries;
+        } else {
+            allDeliveries = [...allDeliveries, ...deliveries];
+        }
+
         renderDeliveries();
+        atualizarBuscaEntrega();
+
     } catch (error) {
         console.error(error);
-        if (deliveryTable) deliveryTable.innerHTML = `<tr class="block md:table-row w-full"><td colspan="6" class="p-4 text-center text-red-500 block md:table-cell w-full">Erro de conexão com o servidor.</td></tr>`;
+
+        if (deliveryTable) {
+            deliveryTable.innerHTML = `
+                <tr class="block md:table-row w-full">
+                    <td colspan="6" class="p-4 text-center text-red-500 block md:table-cell w-full">
+                        Erro de conexão com o servidor.
+                    </td>
+                </tr>
+            `;
+        }
+
+    } finally {
+        loadingDeliveries = false;
     }
 }
 
@@ -275,7 +383,11 @@ if (deliveryForm) {
             stockField.textContent = '';
             stockField.classList.add('hidden');
             
-            displayedCount = 5;
+            currentPage = 1;
+            totalPages = 1;
+            totalRecords = 0;
+            allDeliveries = [];
+
             await carregarEntregas();
             
             alert('Entrega registrada com sucesso!');
@@ -288,6 +400,83 @@ if (deliveryForm) {
             }
             alert(error.message);
         }
+    });
+}
+
+function atualizarBuscaEntrega() {
+    const searchInfo = document.getElementById('searchDeliveryInfo');
+
+    if (!searchInfo) return;
+
+    if (searchTerm) {
+        searchInfo.textContent =
+            `${totalRecords} entrega(s) encontrada(s) para "${searchTerm}"`;
+
+        searchInfo.classList.remove('hidden');
+    } else {
+        searchInfo.classList.add('hidden');
+    }
+}
+
+const searchDeliveryInput = document.getElementById('searchDelivery');
+const clearSearchDeliveryBtn = document.getElementById('clearSearchDelivery');
+
+if (searchDeliveryInput) {
+    searchDeliveryInput.addEventListener('input', () => {
+
+        searchTerm = searchDeliveryInput.value.trim();
+
+        if (clearSearchDeliveryBtn) {
+            clearSearchDeliveryBtn.classList.toggle(
+                'hidden',
+                searchTerm.length === 0
+            );
+        }
+
+        clearTimeout(searchTimeout);
+
+        searchTimeout = setTimeout(async () => {
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            currentPage = 1;
+            totalPages = 1;
+            totalRecords = 0;
+            allDeliveries = [];
+
+            await carregarTabelaEntregas(token, 1);
+
+        }, 400);
+    });
+}
+
+if (clearSearchDeliveryBtn) {
+    clearSearchDeliveryBtn.addEventListener('click', async () => {
+
+        searchDeliveryInput.value = '';
+        searchTerm = '';
+
+        clearSearchDeliveryBtn.classList.add('hidden');
+
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        currentPage = 1;
+        totalPages = 1;
+        totalRecords = 0;
+        allDeliveries = [];
+
+        await carregarTabelaEntregas(token, 1);
+
+        searchDeliveryInput.focus();
     });
 }
 

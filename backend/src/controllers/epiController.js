@@ -2,57 +2,77 @@ const prisma = require('../prisma/client')
 
 class EpiController {
   async list(req, res) {
-     
     try {
 
-          const page = Math.max(parseInt(req.query.page) || 1, 1);
-          const limit = Math.min(
-              Math.max(parseInt(req.query.limit) || 10, 1),
-              100
-          );
+        const page = Math.max(parseInt(req.query.page) || 1, 1);
 
-          const skip = (page - 1) * limit;
+        const limit = Math.min(
+            Math.max(parseInt(req.query.limit) || 5, 1),
+            100
+        );
 
-          const [epis, totalRecords] = await Promise.all([
+        const search = (req.query.search || '').trim();
 
-              prisma.epi.findMany({
-                  skip,
-                  take: limit,
-                  orderBy: {
-                      id: 'asc'
-                  }
-              }),
+        const skip = (page - 1) * limit;
 
-              prisma.epi.count()
+        const where = search
+            ? {
+                OR: [
+                    {
+                        nome: {
+                            contains: search,
+                            mode: 'insensitive'
+                        }
+                    },
+                    {
+                        lote: {
+                            contains: search,
+                            mode: 'insensitive'
+                        }
+                    }
+                ]
+            }
+            : {};
 
-          ]);
+        const [epis, totalRecords] = await Promise.all([
 
-          const totalPages = Math.ceil(totalRecords / limit);
+            prisma.epi.findMany({
+                where,
+                skip,
+                take: limit,
+                orderBy: {
+                    id: 'asc'
+                }
+            }),
 
-          return res.json({
+            prisma.epi.count({
+                where
+            })
 
-              data: epis,
+        ]);
 
-              meta: {
-                  totalRecords,
-                  currentPage: page,
-                  totalPages,
-                  limit
-              }
+        const totalPages = Math.ceil(totalRecords / limit);
 
-          });
+        return res.json({
+            data: epis,
+            meta: {
+                totalRecords,
+                currentPage: page,
+                totalPages,
+                limit,
+                search
+            }
+        });
 
-      } catch (error) {
+    } catch (error) {
 
-          console.error('Erro ao listar EPIs:', error);
+        console.error('Erro ao listar EPIs:', error);
 
-          return res.status(500).json({
-              error: 'Erro ao listar EPIs'
-          });
-
-      }
-
-  }
+        return res.status(500).json({
+            error: 'Erro ao listar EPIs'
+        });
+    }
+}
 
   async create(req, res) {
     const { nome, lote, quantidade, descricao, vencimento } = req.body

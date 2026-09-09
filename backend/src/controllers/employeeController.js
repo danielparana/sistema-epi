@@ -2,63 +2,80 @@ const prisma = require('../prisma/client')
 
 class EmployeeController {
   async list(req, res) {
+
     try {
-      
-          const page = Math.max(parseInt(req.query.page) || 1, 1);
-          const limit = Math.min(
-              Math.max(parseInt(req.query.limit) || 10, 1),
-              100
-          );
 
-          const skip = (page - 1) * limit;
+        const page = Math.max(parseInt(req.query.page) || 1, 1);
 
-          const [employees, totalRecords] = await Promise.all([
+        const limit = Math.min(
+            Math.max(parseInt(req.query.limit) || 5, 1),
+            100
+        );
 
-              prisma.employee.findMany({
-                  where: {
-                      active: true
-                  },
-                  skip,
-                  take: limit,
-                  orderBy: {
-                      id: 'asc'
-                  }
-              }),
+        const search = (req.query.search || '').trim();
 
-              prisma.employee.count({
-                  where: {
-                      active: true
-                  }
-              })
+        const skip = (page - 1) * limit;
 
-          ]);
+        const where = {
+            active: true
+        };
 
-          const totalPages = Math.ceil(totalRecords / limit);
+        if (search) {
+            where.OR = [
+                {
+                    nome: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    cpf: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                }
+            ];
+        }
 
-          return res.json({
+        const [employees, totalRecords] = await Promise.all([
 
-              data: employees,
+            prisma.employee.findMany({
+                where,
+                skip,
+                take: limit,
+                orderBy: {
+                    id: 'asc'
+                }
+            }),
 
-              meta: {
-                  totalRecords,
-                  currentPage: page,
-                  totalPages,
-                  limit
-              }
+            prisma.employee.count({
+                where
+            })
 
-          });
+        ]);
 
-      } catch (error) {
+        const totalPages = Math.ceil(totalRecords / limit);
 
-          console.error('Erro ao listar funcionários:', error);
+        return res.json({
+            data: employees,
+            meta: {
+                totalRecords,
+                currentPage: page,
+                totalPages,
+                limit,
+                search
+            }
+        });
 
-          return res.status(500).json({
-              error: 'Erro ao listar funcionários'
-          });
+    } catch (error) {
 
-      }
+        console.error('Erro ao listar funcionários:', error);
 
-  }
+        return res.status(500).json({
+            error: 'Erro ao listar funcionários'
+        });
+    }
+}
 
   async create(req, res) {
     const { nome, cpf, cargo } = req.body
