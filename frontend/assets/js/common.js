@@ -61,7 +61,10 @@ function injectNavigation() {
 async function initializeHeader() {
     const token = localStorage.getItem("token");
 
-    if (!token) return;
+    if (!token) {
+        window.location.replace("login.html");
+        return;
+    }
 
     try {
         const response = await fetch(`${API_URL}/auth/me`, {
@@ -70,7 +73,10 @@ async function initializeHeader() {
             }
         });
 
-        if (!response.ok) return;
+        if (!response.ok) {
+            window.location.replace("login.html");
+            return;
+        }
 
         const user = await response.json();
 
@@ -147,13 +153,18 @@ function setupDropdowns() {
         if (settingsDropdown) settingsDropdown.classList.add('hidden');
     });
 
-    // Logout Seguro
+ // Logout Seguro
     if (logoutLink) {
         logoutLink.addEventListener('click', (e) => {
             e.preventDefault();
+
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            window.location.href = 'login.html';
+
+            // Marca que o usuário acabou de sair
+            sessionStorage.setItem('logout', 'true');
+
+            window.location.replace('login.html');
         });
     }
 }
@@ -220,3 +231,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4º: Injeta as melhorias de UX/UI focadas em conversão e retenção
     injectUXImprovements();
 }); 
+
+// ==========================================
+// PROTEÇÃO CONTRA RETORNO PELO HISTÓRICO
+// ==========================================
+window.addEventListener('pageshow', function () {
+
+    const token = localStorage.getItem('token');
+    const saiu = sessionStorage.getItem('logout');
+
+    if (!token && saiu === 'true' && !window.location.pathname.includes('login.html')) {
+        window.location.replace('login.html');
+    }
+
+});

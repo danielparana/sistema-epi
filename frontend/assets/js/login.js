@@ -35,6 +35,7 @@ form.addEventListener("submit", async (e) => {
 
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user))
+        sessionStorage.removeItem('logout');
 
         message.style.color = "green";
         message.textContent = "Login realizado com sucesso";
