@@ -150,59 +150,44 @@ window.carregarMaisEpis = async function() {
 // COMUNICAÇÃO COM A API (CRUD)
 // ==========================================
 async function carregarEpis(reset = true) {
-
     const token = localStorage.getItem('token');
-
     if (!token) {
         window.location.href = 'login.html';
         return;
     }
 
-    if (loadingEpis) return;
+    // LIMPA O AVISO: Se houver uma nova tentativa de carregar, remove a barra antiga
+    removerAvisoOffline();
 
+    if (loadingEpis) return;
     loadingEpis = true;
 
+    // Feedback visual seguro: reduz a opacidade sem apagar os dados do ecrã
+    if (epiTable) epiTable.style.opacity = '0.5';
+
     try {
-
         const page = reset ? 1 : currentPage + 1;
+        const params = new URLSearchParams({ page, limit: 5 });
+        if (searchTerm) params.set('search', searchTerm);
 
-        const params = new URLSearchParams({
-            page,
-            limit: 5
+        const response = await fetch(`${API_URL}/epis?${params.toString()}`, {
+            headers: { Authorization: `Bearer ${token}` }
         });
 
-        if (searchTerm) {
-            params.set('search', searchTerm);
-        }
-
-        const response = await fetch(
-            `${API_URL}/epis?${params.toString()}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-        );
-
         if (!response.ok) {
-
             if (response.status === 401) {
                 localStorage.removeItem('token');
                 window.location.href = 'login.html';
                 return;
             }
-
             throw new Error('Falha ao carregar os EPIs');
         }
 
         const result = await response.json();
-
-        const listaEpis = Array.isArray(result)
-            ? result
-            : (result.data || []);
-
+        const listaEpis = Array.isArray(result) ? result : (result.data || []);
         const meta = result.meta || {};
 
+        // SUCESSO: Atualização das variáveis globais autorizada apenas após validação do servidor
         currentPage = meta.currentPage || page;
         totalPages = meta.totalPages || 1;
         totalRecords = meta.totalRecords || listaEpis.length;
@@ -214,45 +199,30 @@ async function carregarEpis(reset = true) {
             lote: ep.lote || "Não definido",
             descricao: ep.descricao || "Sem descrição",
             vencimento: ep.vencimento || "N/A",
-            quantidade: ep.quantidade !== undefined
-                ? ep.quantidade
-                : 0
+            quantidade: ep.quantidade !== undefined ? ep.quantidade : 0
         }));
 
         if (reset) {
             episExistentes = episFormatados;
         } else {
-            episExistentes = [
-                ...episExistentes,
-                ...episFormatados
-            ];
+            episExistentes = [...episExistentes, ...episFormatados];
         }
 
+        // Restaura a opacidade e injeta a nova informação validada
+        if (epiTable) epiTable.style.opacity = '1';
         renderEpis();
-
         populateEpiNames(episExistentes);
-
         atualizarBuscaEpi();
 
     } catch (error) {
-
         console.error(error);
-
-        if (epiTable) {
-            epiTable.innerHTML = `
-                <tr class="w-full block md:table-row">
-                    <td
-                        colspan="9"
-                        class="p-4 text-center text-red-500 w-full block md:table-cell"
-                    >
-                        Erro de conexão com o servidor.
-                    </td>
-                </tr>
-            `;
-        }
-
+        
+        // FALHA: Preservação de estado ativada. Restaura a opacidade e mantém a tabela intacta.
+        if (epiTable) epiTable.style.opacity = '1';
+        
+        // BARRA DE REDE: Chama a nossa barra global corporativa em vez do alert() nativo
+        exibirAvisoOffline();
     } finally {
-
         loadingEpis = false;
     }
 }

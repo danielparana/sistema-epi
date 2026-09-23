@@ -75,36 +75,50 @@
     <main class="p-6 md:p-10 pb-24 md:pb-10 max-w-7xl mx-auto space-y-8">
          
         <!-- Indicadores (KPIs) -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-10">
-    <!-- 1. Estoque Geral -->
-    <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all">
-        <h2 class="text-slate-800 text-sm font-medium mb-3">📦 Estoque Geral</h2>
-        <span class="text-slate-900 text-4xl font-bold" id="totalEstoque">-</span>
+        <!-- Área de Indicadores (Layout Antigo com Novos Ícones) -->
+<!-- Área de Indicadores (Layout Antigo com Novos Ícones e BORDINHA VISÍVEL) -->
+<section class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+    
+    <!-- 1. Estoque Geral (Borda completa fina padrão, sem realce colorido) -->
+    <div class="card-kpi p-6 border border-slate-200 border-solid">
+        <h3 class="flex items-center text-sm font-medium text-slate-500 mb-2">
+            <i class="fa-solid fa-boxes-stacked text-slate-400 mr-2"></i> Estoque Geral
+        </h3>
+        <p class="text-3xl font-bold text-slate-900" id="totalEstoque">-</p>
     </div>
 
-    <!-- 2. Crítico: Vencidos -->
-    <div class="bg-white rounded-xl p-6 border border-slate-200 border-t-4 border-t-red-500 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all">
-        <h2 class="text-slate-800 text-sm font-medium mb-3">🔴 Vencidos</h2>
-        <span class="text-slate-900 text-4xl font-bold" id="vermelho">-</span>
+    <!-- 2. Vencidos (Borda completa fina, lado esquerdo grosso vermelho) -->
+    <div class="card-kpi p-6 border border-slate-200 border-solid border-l-4 border-l-red-500">
+        <h3 class="flex items-center text-sm font-medium text-slate-500 mb-2">
+            <i class="fa-solid fa-circle-exclamation text-red-500 mr-2"></i> Vencidos
+        </h3>
+        <p class="text-3xl font-bold text-slate-900" id="vermelho">-</p>
     </div>
 
-    <!-- 3. Urgente: < 30 dias -->
-    <div class="bg-white rounded-xl p-6 border border-slate-200 border-t-4 border-t-orange-500 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all">
-        <h2 class="text-slate-800 text-sm font-medium mb-3">🟠 Até 30 dias</h2>
-        <span class="text-slate-900 text-4xl font-bold" id="laranja">-</span>
+    <!-- 3. Até 30 dias (Borda completa fina, lado esquerdo grosso laranja) -->
+    <div class="card-kpi p-6 border border-slate-200 border-solid border-l-4 border-l-orange-500">
+        <h3 class="flex items-center text-sm font-medium text-slate-500 mb-2">
+            <i class="fa-solid fa-triangle-exclamation text-orange-500 mr-2"></i> Até 30 dias
+        </h3>
+        <p class="text-3xl font-bold text-slate-900" id="laranja">-</p>
     </div>
 
-    <!-- 4. Atenção: 45 a 30 dias -->
-    <div class="bg-white rounded-xl p-6 border border-slate-200 border-t-4 border-t-yellow-400 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all">
-        <h2 class="text-slate-800 text-sm font-medium mb-3">🟡 Entre 30 e 45 dias</h2>
-        <span class="text-slate-900 text-4xl font-bold" id="amarelo">-</span>
+    <!-- 4. 30 e 45 dias (Borda completa fina, lado esquerdo grosso amarelo) -->
+    <div class="card-kpi p-6 border border-slate-200 border-solid border-l-4 border-l-yellow-400">
+        <h3 class="flex items-center text-sm font-medium text-slate-500 mb-2">
+            <i class="fa-solid fa-bell text-yellow-500 mr-2"></i> Entre 30 e 45 dias
+        </h3>
+        <p class="text-3xl font-bold text-slate-900" id="amarelo">-</p>
     </div>
 
-    <!-- 5. Saudável: 45+ dias -->
-    <div class="bg-white rounded-xl p-6 border border-slate-200 border-t-4 border-t-green-500 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all">
-        <h2 class="text-slate-800 text-sm font-medium mb-3">🟢 Acima de 45 dias</h2>
-        <span class="text-slate-900 text-4xl font-bold" id="verde">-</span>
-    </div>
+   <!-- 5. Saudáveis (Borda completa fina, lado esquerdo grosso verde) -->
+<div class="card-kpi p-6 border border-slate-200 border-solid border-l-4 border-l-green-500">
+    <h3 class="flex items-center text-sm font-medium text-slate-500 mb-2">
+        <i class="fa-solid fa-check-circle text-green-500 mr-2"></i> Acima de 45 dias
+    </h3>
+    <p class="text-3xl font-bold text-slate-900" id="verde">-</p>
+</div>
+
 </section> 
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -112,7 +126,7 @@
             <!-- Coluna Principal (Maior) -->
             <div class="lg:col-span-2 space-y-8">
                 <!-- Seção EPIs em Estoque -->
-                <section class="bg-white rounded-lg p-6 border border-slate-200 shadow-sm">
+               <section class="bg-white p-6 border border-slate-200 border-solid shadow-sm">
                     <h2 class="text-slate-900 text-lg font-medium pb-4 border-b border-slate-200 mb-4">
                         EPIs em Estoque
                     </h2>
@@ -126,7 +140,7 @@
             <!-- Coluna Lateral (Menor) -->
             <div class="space-y-8">
                 <!-- Seção Alertas -->
-                <section class="bg-white rounded-lg p-6 border border-slate-200 shadow-sm">
+                <section class="bg-white p-6 border border-slate-200 border-solid shadow-sm">
                     <h2 class="text-slate-900 text-lg font-medium pb-4 border-b border-slate-200 mb-4 flex items-center gap-2">
                         <span class="text-red-500">⚠</span> Alertas
                     </h2>
@@ -136,7 +150,7 @@
                 </section>
 
                 <!-- Seção Ações Rápidas -->
-                <section class="bg-white rounded-lg p-6 border border-slate-200 shadow-sm">
+              <section class="bg-white p-6 border border-slate-200 border-solid shadow-sm">
                     <h2 class="text-slate-900 text-lg font-medium pb-4 border-b border-slate-200 mb-4">Ações Rápidas</h2>
                     <div class="flex flex-col gap-3 pt-2">
                         <button id="btnEntrega" class="w-full flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 text-white font-medium py-3 px-4 rounded-md transition-colors">

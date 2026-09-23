@@ -31,12 +31,22 @@ async function carregarEntregas() {
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = 'login.html'; return; }
 
-    // Roda todas as requisições em paralelo para carregar a tela mais rápido
-    await Promise.all([
-        carregarFuncionarios(token), 
-        carregarEpis(token), 
-        carregarTabelaEntregas(token, 1)
-    ]);
+    // LIMPA O AVISO: Remove a barra caso seja uma tentativa de reconexão
+    removerAvisoOffline();
+
+    try {
+        // Roda todas as requisições em paralelo para carregar a tela mais rápido
+        await Promise.all([
+            carregarFuncionarios(token), 
+            carregarEpis(token), 
+            carregarTabelaEntregas(token, 1)
+        ]);
+    } catch (error) {
+        console.error("Erro ao carregar dependências de entregas:", error);
+        
+        // BARRA DE REDE: Chama a nossa barra global corporativa
+        exibirAvisoOffline();
+    }
 }
 
 function handleApiError(response) {

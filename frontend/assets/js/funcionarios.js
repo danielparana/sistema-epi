@@ -171,108 +171,75 @@ window.carregarMais = async function() {
 // COMUNICAÇÃO COM A API (CRUD)
 // ==========================================
 async function carregarFuncionarios(page = 1) {
-
     const token = localStorage.getItem('token');
-
     if (!token) {
         window.location.href = 'login.html';
         return;
     }
 
-    if (loadingEmployees) return;
+    // LIMPA O AVISO: Se houver uma nova tentativa de carregar, remove a barra antiga
+    removerAvisoOffline();
 
+    if (loadingEmployees) return;
     loadingEmployees = true;
 
-    try {
+    // Feedback visual seguro: reduz a opacidade sem destruir os dados da tabela
+    if (employeeTable) employeeTable.style.opacity = '0.5';
 
-        const params = new URLSearchParams({
-            page,
-            limit: pageLimit
+    try {
+        const params = new URLSearchParams({ page, limit: pageLimit });
+        if (searchTerm) params.set('search', searchTerm);
+
+        const response = await fetch(`${API_URL}/employees?${params.toString()}`, {
+            headers: { Authorization: `Bearer ${token}` }
         });
 
-        if (searchTerm) {
-            params.set('search', searchTerm);
-        }
-
-        const response = await fetch(
-            `${API_URL}/employees?${params.toString()}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-        );
-
         if (!response.ok) {
-
             if (response.status === 401) {
                 localStorage.removeItem('token');
                 window.location.href = 'login.html';
                 return;
             }
-
             throw new Error('Falha ao carregar funcionários');
         }
 
         const result = await response.json();
-
         const employees = result.data || [];
         const meta = result.meta || {};
 
+        // SUCESSO: Atualização das variáveis globais após validação do servidor
         currentPage = meta.currentPage || page;
         totalPages = meta.totalPages || 1;
         totalRecords = meta.totalRecords || employees.length;
 
-        if (page === 1) {
-
-            allEmployees = employees;
-
-        } else {
-
-            allEmployees = [
-                ...allEmployees,
-                ...employees
-            ];
-        }
-
-        // Formata os CPFs vindos do banco
-        allEmployees = allEmployees.map(emp => {
-
+        // Formatação de segurança para o array processado
+        const formattedEmployees = employees.map(emp => {
             if (!emp.cpf) return emp;
-
             const rawCpf = String(emp.cpf).replace(/\D/g, '');
-
-            const formattedCpf = rawCpf.replace(
-                /^(\d{3})(\d{3})(\d{3})(\d{2})$/,
-                '$1.$2.$3-$4'
-            );
-
-            return {
-                ...emp,
-                cpf: formattedCpf
-            };
-
+            const formattedCpf = rawCpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+            return { ...emp, cpf: formattedCpf };
         });
 
-        renderEmployees();
+        if (page === 1) {
+            allEmployees = formattedEmployees;
+        } else {
+            allEmployees = [...allEmployees, ...formattedEmployees];
+        }
 
+        // Restaura a opacidade e renderiza a nova informação
+        if (employeeTable) employeeTable.style.opacity = '1';
+        renderEmployees();
         atualizarBuscaFuncionario();
 
     } catch (error) {
-
         console.error(error);
 
-        employeeTable.innerHTML = `
-            <tr>
-                <td colspan="5"
-                    class="p-4 text-center text-red-500 font-medium block md:table-cell w-full">
-                    Erro de conexão com o servidor.
-                </td>
-            </tr>
-        `;
+        // FALHA: Preservação de estado ativada. Restaura opacidade e mantém a tabela original no ecrã.
+        if (employeeTable) employeeTable.style.opacity = '1';
 
+        // BARRA DE REDE: Chama a nossa barra global corporativa em vez do alert() nativo
+        exibirAvisoOffline();
     } finally {
-
         loadingEmployees = false;
     }
 }

@@ -15,10 +15,20 @@ async function carregarPagina() {
         window.location.href = 'login.html'
         return
     }
-    await Promise.all([
-        carregarFuncionarios(),
-        carregarEpis()
-    ])
+
+    // LIMPA O AVISO: Caso seja uma tentativa de recarregar a página
+    removerAvisoOffline();
+
+    try {
+        await Promise.all([
+            carregarFuncionarios(),
+            carregarEpis()
+        ])
+    } catch (error) {
+        console.error("Erro ao carregar as listas de seleção iniciais:", error);
+        // BARRA DE REDE: Se a rede falhar logo ao abrir a página, avisa o utilizador
+        exibirAvisoOffline();
+    }
 }
 
 function handleApiError(response) {
@@ -33,9 +43,12 @@ async function carregarFuncionarios() {
     const response = await fetch(`${API_URL}/employees`, {
         headers: { Authorization: `Bearer ${token}` }
     })
-    if (!response.ok) { handleApiError(response); return; }
+    
+    // Agora lança o erro para ser capturado pelo try...catch do carregarPagina
+    if (!response.ok) { handleApiError(response); throw new Error('Falha ao carregar funcionários'); }
 
-    employees = await response.json()
+    const data = await response.json()
+    employees = data.data || []
     employeeSelect.innerHTML = '<option value="">Todos</option>'
     employees.forEach(employee => {
         const option = document.createElement('option')
@@ -50,9 +63,12 @@ async function carregarEpis() {
     const response = await fetch(`${API_URL}/epis`, {
         headers: { Authorization: `Bearer ${token}` }
     })
-    if (!response.ok) { handleApiError(response); return; }
+    
+    // Agora lança o erro para ser capturado pelo try...catch do carregarPagina
+    if (!response.ok) { handleApiError(response); throw new Error('Falha ao carregar EPIs'); }
 
-    epis = await response.json()
+    const data = await response.json()
+    epis = data.data || []
     epiSelect.innerHTML = '<option value="">Todos</option>'
     epis.forEach(epi => {
         const option = document.createElement('option')
@@ -66,6 +82,9 @@ async function carregarRelatorio() {
     const token = localStorage.getItem('token')
     if (!token) { window.location.href = 'login.html'; return; }
 
+    // LIMPA O AVISO: Remove a barra se o utilizador tentar gerar novamente
+    removerAvisoOffline();
+
     const params = new URLSearchParams()
     if (periodStart.value) params.append('startDate', periodStart.value)
     if (periodEnd.value) params.append('endDate', periodEnd.value)
@@ -76,6 +95,9 @@ async function carregarRelatorio() {
     viewButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Buscando...';
     viewButton.disabled = true;
 
+    // Feedback visual seguro: reduz opacidade para indicar processamento sem destruir dados
+    if (reportResult) reportResult.style.opacity = '0.5';
+
     try {
         const response = await fetch(`${API_URL}/reports?${params.toString()}`, {
             headers: { Authorization: `Bearer ${token}` }
@@ -84,15 +106,30 @@ async function carregarRelatorio() {
         viewButton.disabled = false;
         viewButton.innerHTML = viewBtnOriginal;
 
-        if (!response.ok) { handleApiError(response); return; }
+        if (!response.ok) { 
+            if (response.status === 401) {
+                handleApiError(response); 
+                return;
+            }
+            throw new Error('Falha na comunicação com a API');
+        }
 
         currentReports = await response.json()
+        
+        // SUCESSO: Restaura a opacidade e desenha a nova tabela
+        if (reportResult) reportResult.style.opacity = '1';
         renderizarTabela(currentReports)
+
     } catch (error) {
         console.error(error);
         viewButton.disabled = false;
         viewButton.innerHTML = viewBtnOriginal;
-        reportResult.innerHTML = `<div class="p-6 text-center text-red-500 bg-red-50 rounded-lg border border-red-100">Erro de conexão ao gerar relatório.</div>`;
+        
+        // FALHA: Preservação de estado ativada. Restaura opacidade e mantém a tabela anterior.
+        if (reportResult) reportResult.style.opacity = '1';
+        
+        // BARRA DE REDE: Chama a nossa barra global corporativa
+        exibirAvisoOffline();
     }
 }
 

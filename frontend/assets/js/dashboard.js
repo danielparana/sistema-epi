@@ -437,34 +437,30 @@ function abrirDetalhesAlerta(id) {
 // CARREGA DASHBOARD
 // ==========================
 
+// ==========================
+// CARREGA DASHBOARD
+// ==========================
+
 async function loadDashboard() {
 
     try {
 
-        const response =
-            await fetch(
-                `${API_URL}/dashboard/stats`,
-                {
-                    headers: {
-                        Authorization:
-                            `Bearer ${token}`
-                    }
-                }
-            );
+        const response = await fetch(`${API_URL}/dashboard/stats`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
 
         if (!response.ok) {
-
-            throw new Error(
-                "Erro ao carregar dashboard"
-            );
-
+            throw new Error("Erro ao carregar dashboard");
         }
 
-        const data =
-            await response.json();
+        const data = await response.json();
+
+        // SUCESSO: Remove o aviso visual caso a internet tenha voltado
+        removerAvisoOffline();
 
         epiDashboard = data.epis;
-
         dashboardData = data;
 
         verificarLembrete(data);
@@ -474,187 +470,66 @@ async function loadDashboard() {
         // CARDS SUPERIORES
         // ==========================
 
-        document.getElementById(
-            "totalEstoque"
-        ).textContent =
-            data.estoqueTotal;
-
-        document.getElementById(
-            "verde"
-        ).textContent =
-            data.verde;
-
-        document.getElementById(
-            "amarelo"
-        ).textContent =
-            data.amarelo;
-
-        document.getElementById(
-            "laranja"
-        ).textContent =
-            data.laranja;
-
-        document.getElementById(
-            "vermelho"
-        ).textContent =
-            data.vermelho;
+        document.getElementById("totalEstoque").textContent = data.estoqueTotal;
+        document.getElementById("verde").textContent = data.verde;
+        document.getElementById("amarelo").textContent = data.amarelo;
+        document.getElementById("laranja").textContent = data.laranja;
+        document.getElementById("vermelho").textContent = data.vermelho;
 
 
         // ==========================
         // LISTA DE ALERTAS
         // ==========================
 
-        const listaAlertas =
-            document.getElementById(
-                "listaAlertas"
-            );
+        const listaAlertas = document.getElementById("listaAlertas");
 
         if (data.alertas.length === 0) {
-
             listaAlertas.innerHTML = `
                 <div class="alert-success">
                     Nenhum EPI necessita atenção.
                 </div>
             `;
-
         } else {
+            // Renderiza Alertas (Design Antigo com Novos Ícones)
+listaAlertas.innerHTML = data.alertas.map(alerta => {
+    let corClara = "", iconClasses = "";
 
-            listaAlertas.innerHTML =
-                data.alertas.map(alerta => {
+    switch (alerta.status) {
+        case "vermelho":
+            corClara = "border-red-500 bg-red-50";
+            iconClasses = "fa-circle-exclamation text-red-500";
+            break;
+        case "laranja":
+            corClara = "border-orange-500 bg-orange-50";
+            iconClasses = "fa-triangle-exclamation text-orange-500";
+            break;
+        case "amarelo":
+            corClara = "border-yellow-500 bg-yellow-50";
+            iconClasses = "fa-bell text-yellow-500";
+            break;
+        default:
+            corClara = "border-green-500 bg-green-50";
+            iconClasses = "fa-shield-check text-green-500";
+    }
 
-                    let cor = "";
-                    let icone = "";
-
-                    switch (alerta.status) {
-
-                        case "vermelho":
-
-                            cor =
-                                "border-red-500 bg-red-50";
-
-                            icone = "🔴";
-
-                            break;
-
-                        case "laranja":
-
-                            cor =
-                                "border-orange-500 bg-orange-50";
-
-                            icone = "🟠";
-
-                            break;
-
-                        case "amarelo":
-
-                            cor =
-                                "border-yellow-500 bg-yellow-50";
-
-                            icone = "🟡";
-
-                            break;
-
-                        default:
-
-                            cor =
-                                "border-green-500 bg-green-50";
-
-                            icone = "🟢";
-                    }
-
-                    const funcionarios =
-                        alerta.funcionarios.length
-                            ? alerta.funcionarios
-                                .map(f => f.nome)
-                                .join(", ")
-                            : "Nenhum funcionário";
-
-                    return `
-
-                        <div
-                            onclick="abrirDetalhesAlerta(${alerta.id})"
-                            class="
-                                cursor-pointer
-                                rounded-lg
-                                border-l-4
-                                ${cor}
-                                p-4
-                                hover:shadow-md
-                                transition-all
-                            "
-                        >
-
-                            <div
-                                class="
-                                    flex
-                                    justify-between
-                                    items-start
-                                "
-                            >
-
-                                <div>
-
-                                    <h3
-                                        class="
-                                            font-semibold
-                                            text-slate-800
-                                        "
-                                    >
-                                        ${icone}
-                                        ${alerta.nome}
-                                    </h3>
-
-                                    <p
-                                        class="
-                                            text-sm
-                                            text-slate-600
-                                        "
-                                    >
-                                        Lote ${alerta.lote}
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-                            <div
-                                class="
-                                    mt-3
-                                    text-sm
-                                    text-slate-600
-                                "
-                            >
-
-                                <p>
-                                    <strong>
-                                        Quantidade:
-                                    </strong>
-
-                                    ${alerta.quantidade}
-                                </p>
-
-                                <p>
-                                    <strong>
-                                        Validade:
-                                    </strong>
-
-                                    ${
-                                        alerta.vencimento
-                                            ? formatDateISOtoBR(
-                                                alerta.vencimento
-                                              )
-                                            : "-"
-                                    }
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    `;
-
-                }).join("");
-
+    return `
+        <div onclick="abrirDetalhesAlerta(${alerta.id})" class="cursor-pointer rounded-lg border-l-4 ${corClara} p-4 hover:shadow-md transition-all">
+            <div class="flex justify-between items-start">
+                <div>
+                    <!-- Substituição: Emoji por ícone FA -->
+                    <h3 class="flex items-center font-semibold text-slate-800">
+                        <i class="fa-solid ${iconClasses} mr-2"></i> ${alerta.nome}
+                    </h3>
+                    <p class="text-sm text-slate-600 pl-6">Lote ${alerta.lote}</p>
+                </div>
+            </div>
+            <div class="mt-3 text-sm text-slate-600 pl-6">
+                <p><strong>Quantidade:</strong> ${alerta.quantidade}</p>
+                <p><strong>Validade:</strong> ${alerta.vencimento ? formatDateISOtoBR(alerta.vencimento) : "-"}</p>
+            </div>
+        </div>
+    `;
+}).join("");
         }
 
 
@@ -662,197 +537,56 @@ async function loadDashboard() {
         // LISTA DE EPIs
         // ==========================
 
-        const listaEpis =
-            document.getElementById(
-                "listaEpis"
-            );
+        const listaEpis = document.getElementById("listaEpis");
 
-        listaEpis.innerHTML =
-            data.epis.map(epi => {
+        // Renderiza Lista Geral (Design Antigo com Novos Ícones)
+listaEpis.innerHTML = data.epis.map(epi => {
+    let statusClasses = "";
 
-                let status = "";
+    if (epi.vencimento) {
+        const hojeStr = new Date().toISOString().split("T")[0];
+        const vencimentoStr = epi.vencimento.split("T")[0];
+        const dias = daysDiffUTC(hojeStr, vencimentoStr);
 
-                if (epi.vencimento) {
-
-                    const hojeStr =
-                        new Date()
-                            .toISOString()
-                            .split("T")[0];
-
-                    const vencimentoStr =
-                        epi.vencimento
-                            .split("T")[0];
-
-                    const dias =
-                        daysDiffUTC(
-                            hojeStr,
-                            vencimentoStr
-                        );
-
-                    if (dias < 0)
-                        status = "vermelho";
-
-                    else if (dias <= 30)
-                        status = "laranja";
-
-                    else if (dias <= 45)
-                        status = "amarelo";
-
-                    else
-                        status = "verde";
-                }
-
-                let icone = "🟢";
-
-                if (status === "vermelho")
-                    icone = "🔴";
-
-                if (status === "laranja")
-                    icone = "🟠";
-
-                if (status === "amarelo")
-                    icone = "🟡";
-
-
-                return `
-
-                    <div
-                        onclick="mostrarDetalhesEpi(${epi.id})"
-                        class="
-                            bg-white
-                            border
-                            border-slate-200
-                            rounded-xl
-                            p-4
-                            cursor-pointer
-                            hover:shadow-lg
-                            hover:-translate-y-1
-                            transition-all
-                            duration-200
-                        "
-                    >
-
-                        <div
-                            class="
-                                flex
-                                justify-between
-                                items-start
-                            "
-                        >
-
-                            <div>
-
-                                <h3
-                                    class="
-                                        font-semibold
-                                        text-slate-800
-                                    "
-                                >
-                                    ${icone}
-                                    ${epi.nome}
-                                </h3>
-
-                                <p
-                                    class="
-                                        text-sm
-                                        text-slate-500
-                                    "
-                                >
-                                    Lote ${epi.lote}
-                                </p>
-
-                            </div>
-
-                            <i
-                                class="
-                                    fa-solid
-                                    fa-chevron-right
-                                    text-slate-400
-                                "
-                            ></i>
-
-                        </div>
-
-
-                        <div
-                            class="
-                                mt-4
-                                grid
-                                grid-cols-2
-                                gap-4
-                            "
-                        >
-
-                            <div>
-
-                                <p
-                                    class="
-                                        text-xs
-                                        uppercase
-                                        text-slate-400
-                                    "
-                                >
-                                    Validade
-                                </p>
-
-                                <p
-                                    class="
-                                        font-medium
-                                    "
-                                >
-
-                                    ${
-                                        epi.vencimento
-                                            ? formatDateISOtoBR(
-                                                epi.vencimento
-                                              )
-                                            : "-"
-                                    }
-
-                                </p>
-
-                            </div>
-
-
-                            <div>
-
-                                <p
-                                    class="
-                                        text-xs
-                                        uppercase
-                                        text-slate-400
-                                    "
-                                >
-                                    Estoque
-                                </p>
-
-                                <p
-                                    class="
-                                        font-bold
-                                        text-lg
-                                    "
-                                >
-                                    ${epi.quantidade}
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                `;
-
-            }).join("");
-
+        if (dias < 0) statusClasses = "fa-circle-exclamation text-red-500";
+        else if (dias <= 30) statusClasses = "fa-triangle-exclamation text-orange-500";
+        else if (dias <= 45) statusClasses = "fa-bell text-yellow-500";
+        else statusClasses = "fa-shield-check text-green-500";
+    } else {
+        statusClasses = "fa-shield-check text-green-500"; // Padrão para sem vencimento
     }
 
-    catch (error) {
+    return `
+        <div onclick="mostrarDetalhesEpi(${epi.id})" class="bg-white border border-slate-200 rounded-xl p-4 cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
+            <div class="flex justify-between items-start">
+                <div>
+                    <!-- Substituição: Emoji por ícone FA -->
+                    <h3 class="flex items-center font-semibold text-slate-800">
+                        <i class="fa-solid ${statusClasses} mr-2"></i> ${epi.nome}
+                    </h3>
+                    <p class="text-sm text-slate-500 pl-6">Lote ${epi.lote}</p>
+                </div>
+                <i class="fa-solid fa-chevron-right text-slate-400 mt-1"></i>
+            </div>
+            <div class="mt-4 grid grid-cols-2 gap-4 pl-6">
+                <div>
+                    <p class="text-xs uppercase text-slate-400">Validade</p>
+                    <p class="font-medium">${epi.vencimento ? formatDateISOtoBR(epi.vencimento) : "-"}</p>
+                </div>
+                <div>
+                    <p class="text-xs uppercase text-slate-400">Estoque</p>
+                    <p class="font-bold text-lg">${epi.quantidade}</p>
+                </div>
+            </div>
+        </div>
+    `;
+}).join("");
 
+    } catch (error) {
         console.error(error);
-
+        // FALHA: Mostra a barra vermelha e preserva os dados no ecrã
+        exibirAvisoOffline();
     }
-
 }
 
 
@@ -945,3 +679,4 @@ async function init() {
 }
 
 init();
+

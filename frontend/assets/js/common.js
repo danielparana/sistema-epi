@@ -95,8 +95,36 @@ async function initializeHeader() {
         // APLICA PERMISSÕES DEPOIS DE INJETAR O MENU
         aplicarPermissoesGlobais();
 
+        // EXECUTA A BLINDAGEM DE ROTA IMEDIATAMENTE (Nova linha)
+        verificarAcessoRota();
+
     } catch (error) {
         console.error('Erro ao carregar usuário:', error);
+    }
+}
+
+
+// ==========================================
+// GUARDA DE ROTAS (Route Guard)
+// ==========================================
+function verificarAcessoRota() {
+    const user = window.currentUser || JSON.parse(localStorage.getItem("user"));
+    if (!user) return;
+
+    // Se o utilizador for funcionário operacional, aplicamos a restrição rigorosa
+    if (user.role === "FUNCIONARIO") {
+        const pathAtual = window.location.pathname.toLowerCase();
+        
+        // Lista negra de páginas onde o funcionário não pode entrar
+        const rotasProibidas = ['funcionarios.html', 'epis.html', 'relatorios.html'];
+        
+        // Verifica se o URL atual está na lista negra
+        const tentativaInvasao = rotasProibidas.some(rota => pathAtual.includes(rota));
+
+        if (tentativaInvasao) {
+            // Expulsa imediatamente o utilizador de volta para o dashboard
+            window.location.replace("dashboard.html");
+        }
     }
 }
 
@@ -120,6 +148,7 @@ function aplicarPermissoesGlobais() {
         if (navRelatorios) navRelatorios.style.display = "none";
     }
 }
+
 
 // ==========================================
 // 4. INTERAÇÕES E DROPDOWNS (Tailwind Fix)
@@ -181,17 +210,17 @@ function injectUXImprovements() {
     
     if (headerActions && !document.getElementById('btnUpgrade')) {
         const upgradeBtnHTML = `
-            <!-- Versão Desktop: Botão Persuasivo -->
-            <a href="https://forms.gle/L5P39g6hALqYKnFp9" id="btnUpgrade" class="hidden sm:flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-5 py-2.5 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 border border-green-400/30 mr-2 md:mr-4">
-                <i class="fa-solid fa-crown text-yellow-300"></i>
-                <span>Fazer Upgrade</span>
-            </a>
-            
-            <!-- Versão Mobile: Ícone de Destaque com Animação -->
-            <a href="https://forms.gle/L5P39g6hALqYKnFp9" class="flex sm:hidden items-center justify-center w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full shadow-md mr-1 animate-[pulse_2s_ease-in-out_infinite] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-                <i class="fa-solid fa-crown text-yellow-300"></i>
-            </a>
-        `;
+    <!-- Versão Desktop: Botão Persuasivo -->
+    <a href="https://forms.gle/L5P39g6hALqYKnFp9" target="_blank" rel="noopener noreferrer" id="btnUpgrade" class="hidden sm:flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-5 py-2.5 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 border border-green-400/30 mr-2 md:mr-4">
+        <i class="fa-solid fa-crown text-yellow-300"></i>
+        <span>Fazer Upgrade</span>
+    </a>
+    
+    <!-- Versão Mobile: Ícone de Destaque com Animação -->
+    <a href="https://forms.gle/L5P39g6hALqYKnFp9" target="_blank" rel="noopener noreferrer" class="flex sm:hidden items-center justify-center w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full shadow-md mr-1 animate-[pulse_2s_ease-in-out_infinite] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+        <i class="fa-solid fa-crown text-yellow-300"></i>
+    </a>
+`;
         
         headerActions.insertAdjacentHTML('afterbegin', upgradeBtnHTML);
     }
@@ -245,3 +274,29 @@ window.addEventListener('pageshow', function () {
     }
 
 });
+
+// ==========================================
+// 6. GESTÃO DE CONECTIVIDADE (AVISO DE REDE)
+// ==========================================
+window.exibirAvisoOffline = function() {
+    window.removerAvisoOffline();
+
+    // fixed top-0 w-full z-[9999] garante que a barra cole no topo absoluto da tela
+    // animate-pulse adiciona o efeito pulsante (piscando)
+    const avisoHTML = `
+        <div id="offline-alert" class="fixed top-0 left-0 w-full z-[9999] bg-red-500 text-white p-2 text-center text-sm font-medium shadow-md flex justify-center items-center gap-2 animate-pulse">
+            <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+            <span>Não foi possível comunicar com o servidor. Verifique a sua conexão.</span>
+        </div>
+    `;
+
+    // Injeta diretamente no body, escapando de qualquer margem ou padding do <main>
+    document.body.insertAdjacentHTML('afterbegin', avisoHTML);
+};
+
+window.removerAvisoOffline = function() {
+    const alertaExistente = document.getElementById('offline-alert');
+    if (alertaExistente) {
+        alertaExistente.remove();
+    }
+};
